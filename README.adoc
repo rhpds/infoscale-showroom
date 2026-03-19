@@ -14,7 +14,7 @@ https://rhpds.github.io/showroom_template_nookbag/
 
 == Quick Start
 
-. https://github.com/rhpds/showroom_template_nookbag/generate[Create a repo from this template] (suggested naming: `showroom_<lab-name>`)
+. https://github.com/rhpds/showroom_template_nookbag/generate[Create a repo from this template] (suggested naming: `<lab-name>-showroom`)
 . Clone your new repo and preview locally:
 +
 [source,sh]
