@@ -223,9 +223,12 @@ asciidoc:
 
 == Extensions
 
-Showroom content images include the https://github.com/sntke/antora-mermaid-extension[Mermaid extension] for Antora, which lets you embed diagrams and visualizations written in text directly in your AsciiDoc pages.
+Showroom provides Antora extensions that add rich content features to your lab pages.
+Register them in the `antora.extensions` section of your `site.yml` playbook.
 
-Add the extension to your `site.yml` playbook:
+=== Mermaid Diagrams
+
+The https://github.com/sntke/antora-mermaid-extension[Mermaid extension] lets you embed diagrams and visualizations written in text directly in your AsciiDoc pages.
 
 [source,yaml]
 ----
@@ -427,6 +430,219 @@ to change the editor theme.
 | `\menu:Top[Sub > Item]`
 | menu:File[Export > PDF]
 |===
+
+== Execute in Terminal
+
+The Showroom theme includes an optional "Run in terminal" button for code blocks.
+When enabled, the button sends the code directly to the active terminal tab -- readers can execute commands with a single click instead of copy-pasting.
+
+=== Usage
+
+Add the `execute` role to any source block you want to be runnable.
+There are two equivalent syntaxes:
+
+**Option 1: Role on the source directive**
+
+[source,asciidoc]
+-----
+[source,bash,role="execute"]
+----
+cat /etc/issue
+----
+-----
+
+**Option 2: Shorthand role annotation**
+
+[source,asciidoc]
+-----
+[.execute]
+[source,bash]
+----
+cat /etc/issue
+----
+-----
+
+Both produce the same result:
+
+[.execute]
+[source,bash]
+----
+cat /etc/issue
+----
+
+Hovering over the code block shows two buttons: the standard **Copy** icon and a **terminal** icon.
+Clicking the terminal icon sends the command to the active terminal tab and presses Enter.
+
+=== When to Use It
+
+Use `.execute` for commands that are safe to run as-is and don't require the reader to edit them first.
+Avoid it for commands containing placeholders the reader must replace:
+
+[cols="1a,1a",options="header"]
+|===
+| Good -- use `.execute` | Bad -- do not use `.execute`
+
+|
+[source,asciidoc]
+-----
+[source,bash,role="execute"]
+----
+oc whoami
+----
+-----
+
+or equivalently:
+
+[source,asciidoc]
+-----
+[.execute]
+[source,bash]
+----
+oc whoami
+----
+-----
+|
+[source,asciidoc]
+-----
+[source,bash]
+----
+ssh <your-username>@bastion.example.com
+----
+-----
+|===
+
+TIP: Combine `.execute` with AsciiDoc attribute substitution so the command is ready to run.
+For example, `oc login -u \{ssh_user}` with `subs="attributes"` lets the command include the participant's actual username.
+
+=== Split Terminal Layouts
+
+Showroom supports split terminal tabs where the right pane is divided into a **top** and **bottom** terminal.
+This is configured in `ui-config.yml` using the `secondary_name`, `secondary_path`, and `secondary_port` properties on a tab:
+
+[source,yaml]
+----
+tabs:
+  - name: Terminals
+    path: /wetty
+    port: 443
+    secondary_name: Worker
+    secondary_path: /wetty
+    secondary_port: 443
+----
+
+See xref:ui-config.adoc#_two_terminals_stacked[Two Terminals (Stacked)] for the full configuration reference.
+
+When a split tab is active, the execute roles let you target a specific half:
+
+[cols="1,3",options="header"]
+|===
+|Role |Target
+
+|`.execute`
+|Top / primary terminal (or the only terminal in a non-split tab). Alias for `.execute-top`.
+
+|`.execute-top`
+|Top / primary terminal explicitly. Identical to `.execute`.
+
+|`.execute-bottom`
+|Bottom / secondary terminal in a split tab.
+
+|`.execute-top.execute-bottom`
+|Both -- two buttons, one for each terminal.
+|===
+
+==== Targeting the top terminal
+
+For the top terminal, `.execute` and `.execute-top` are interchangeable.
+Use whichever reads more clearly in context -- `.execute` is shorter for single-terminal tabs, `.execute-top` is more explicit when split terminals are in play:
+
+[source,asciidoc]
+-----
+[source,bash,role="execute-top"]
+----
+oc get pods
+----
+-----
+
+Rendered output:
+
+[.execute-top]
+[source,bash]
+----
+cat /etc/issue
+----
+
+==== Targeting the bottom terminal
+
+Use `.execute-bottom` to send a command to the secondary terminal:
+
+[source,asciidoc]
+-----
+[source,bash,role="execute-bottom"]
+----
+tail -f /var/log/messages
+----
+-----
+
+The button for the bottom terminal shows a **2** badge so readers can tell the two apart.
+
+Rendered output:
+
+[.execute-bottom]
+[source,bash]
+----
+cat /etc/issue
+----
+
+==== Targeting both terminals
+
+Combine both roles on one block to render two execute buttons -- useful when you want the reader to run the same command in both terminals:
+
+[source,asciidoc]
+-----
+[.execute-top.execute-bottom]
+[source,bash]
+----
+oc get nodes
+----
+-----
+
+Or with inline role syntax:
+
+[source,asciidoc]
+-----
+[source,bash,role="execute-top execute-bottom"]
+----
+oc get nodes
+----
+-----
+
+Rendered output:
+
+[.execute-top.execute-bottom]
+[source,bash]
+----
+cat /etc/issue
+----
+
+==== What happens on a non-split tab?
+
+If the active tab is a single terminal (no `secondary_*` config), `.execute-bottom` gracefully falls back to the primary terminal.
+Content is portable -- you don't need separate pages for split and non-split layouts.
+
+=== Without `.execute`
+
+A regular code block without the role gets only the copy button -- no terminal injection:
+
+[source,bash]
+----
+echo "This block only has copy"
+----
+
+=== How It Works
+
+The execute roles (`.execute`, `.execute-top`, `.execute-bottom`) add corresponding CSS classes to the listing block's wrapper `div`.
+The theme JavaScript detects these classes and adds "Run in terminal" buttons that dispatch the code as keyboard input to the matching terminal iframe in the active tab.
 
 == Creating Content with AI Tools
 
