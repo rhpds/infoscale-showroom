@@ -29,7 +29,7 @@ The `DataReplication` resource tells InfoScale to replicate the persistent data 
 
 . Apply the DataReplication manifest on `{primary_cluster}`:
 +
-[source,yaml]
+[source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
 apiVersion: infoscale.veritas.com/v1
@@ -60,11 +60,6 @@ spec:
   localNIC: br-ex
   localNetMask: 255.255.0.0
 EOF
-----
-+
-[source,role="execute"]
-----
-oc apply -f infoscale-dr-datarep.yaml -n infoscale-vtas
 ----
 
 . Verify that the DataReplication resource was created:
@@ -159,7 +154,7 @@ The `DisasterRecoveryPlan` defines which workload to protect, the preferred clus
 
 . Apply the DisasterRecoveryPlan manifest on `{primary_cluster}`:
 +
-[source,yaml]
+[source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
 apiVersion: infoscale.veritas.com/v1
@@ -178,11 +173,6 @@ spec:
   primaryCluster: cluster-prod
   dataReplicationPointer: openmrs-datarep
 EOF
-----
-+
-[source,role="execute"]
-----
-oc create -f infoscale-dr-recoveryplan.yaml
 ----
 
 . Verify that the DisasterRecoveryPlan was created:
