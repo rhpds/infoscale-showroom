@@ -50,45 +50,6 @@ Confirm the following before continuing:
 
 To validate data consistency after the DR failover in Module 5, you need a known record written to persistent storage. You'll expose the application via an OpenShift Route, then create a patient appointment record that you can verify post-failover.
 
-=== Expose the VM application
-
-. Apply the manifest that creates both a Service and an OpenShift Route for the OpenMRS application:
-+
-[source,yaml]
-----
-apiVersion: v1
-kind: Service
-metadata:
-  name: svcopenmrs
-  namespace: openmrs
-spec:
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
-  selector:
-    kubevirt.io/domain: openmrs01
----
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: openmrs
-  namespace: openmrs
-spec:
-  to:
-    kind: Service
-    name: svcopenmrs
-  port:
-    targetPort: 80
-  tls:
-    termination: edge
-----
-+
-[source,role="execute"]
-----
-oc apply -f openmrs-exposeport.yaml
-----
-
 . Verify the Service was created:
 +
 [source,role="execute"]

@@ -45,9 +45,9 @@ spec:
       latencyProtection: disable
       logProtection: autodcm
       networkTransportProtocol: TCP
-      remoteHostAddress: 192.168.20.200   # pre-configured in your environment
+      remoteHostAddress: 10.10.20.11        # A new floating IP will be enabled automatically
       remoteNIC: br-ex
-      remoteNetMask: 255.255.255.0
+      remoteNetMask: 255.255.0.0
       replicationState: start
       replicationType: async
   cloudVendor: Local
@@ -55,9 +55,9 @@ spec:
     namespace: openmrs
   currentPrimary: cluster-prod
   force: false
-  localHostAddress: 192.168.20.201        # pre-configured in your environment
-  localNIC: ens256
-  localNetMask: 255.255.255.0
+  localHostAddress: 10.10.10.11           # A new floating IP will be enabled automatically
+  localNIC: br-ex
+  localNetMask: 255.255.0.0
 ----
 +
 [source,role="execute"]
@@ -112,15 +112,15 @@ Spec:
   Current Primary:     cluster-prod
   Force:               false
   LB Enabled:          false
-  Local Host Address:  192.168.0.43
+  Local Host Address:  10.10.10.11
   Local NIC:           br-ex
-  Local Net Mask:      255.255.255.0
+  Local Net Mask:      255.255.0.0
   Remote Cluster Details:
     Bandwidth Limit:             N/A
     Latency Protection:          disable
     Log Protection:              autoln
     Network Transport Protocol:  TCP
-    Remote Host Address:         192.168.0.42
+    Remote Host Address:         10.10.20.11
     Remote NIC:                  br-ex
     Replication State:           start
     Replication Type:            async
@@ -131,14 +131,14 @@ Status:
   Current Details:
     Phase:           ReplicationStartedSuccessfully
     Primary Status:
-      Primary Host:   192.168.0.43
+      Primary Host:   10.10.10.11
       RVG State:      enabled for I/O
     Secondary Status:
       Data Status:                 consistent, up-to-date
       Replication Mode:            asynchronous
       Replication State:           start
       Replication Status:          replicating (connected)
-      Secondary Host:              192.168.0.42
+      Secondary Host:              10.10.20.11
       State:                       behind by 0m 0s
 ----
 

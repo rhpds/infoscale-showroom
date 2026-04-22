@@ -31,11 +31,12 @@ This workshop uses two pre-configured OpenShift {ocp_version} SNO clusters repre
 
 You will have access to:
 
-* Primary cluster console: {openshift_console_url}
-* Username: {user}
-* Password: {password}
+* Two pre-configured OpenShift SNO clusters: `cluster-prod` (Primary) and `cluster-dr` (Secondary)
+* Access to both clusters via SSH through a bastion host
+* All lab YAML files pre-loaded and ready to apply
+* The OpenMRS Healthcare VM pre-deployed and running on `cluster-prod`
 
-NOTE: All environment details and credentials are available in the lab interface.
+Connection details and SSH credentials will be provided by your lab facilitator at the start of the session.
 
 == Estimated time
 

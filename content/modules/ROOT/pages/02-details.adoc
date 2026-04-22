@@ -59,8 +59,11 @@ NOTE: InfoScale for Kubernetes {infoscale_version} is pre-installed on both clus
 
 == Authors and contributors
 
-**Workshop Authors**: Joseph D'Angelo, Director of Product Management | Marcelo Gigliotti, Sr. Principal Product Manager +
-**Last Updated**: April 2026 +
-**Workshop Version**: 1.0
+Workshop Authors:
+
+* Joseph D'Angelo, Director of Product Management
+* Marcelo Gigliotti, Sr. Principal Product Manager
+
+Last Updated: April 2026. Workshop Version: 1.0. For feedback or corrections, submit an issue via the Red Hat Demo Platform workshop repository.
 
 For feedback or corrections, submit an issue via the Red Hat Demo Platform workshop repository.

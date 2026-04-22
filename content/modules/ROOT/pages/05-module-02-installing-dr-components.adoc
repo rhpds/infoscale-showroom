@@ -254,10 +254,10 @@ metadata:
 spec:
   globalMemberClusters:
     - clusterID: cluster-prod
-      drControllerAddress: 192.168.0.10    # pre-configured in your environment
+      drControllerAddress: 10.10.10.10     # pre-configured in your environment
       drControllerPort: '30913'            # replace with Primary Cluster NodePort
     - clusterID: cluster-dr
-      drControllerAddress: 192.168.20.51   # pre-configured in your environment
+      drControllerAddress: 10.10.20.10     # pre-configured in your environment
       drControllerPort: '30863'            # replace with Secondary Cluster NodePort
   backupClusterScopeCRD: true
   counterMissTolerance: 5
@@ -309,10 +309,10 @@ metadata:
 spec:
   globalMemberClusters:
     - clusterID: cluster-dr
-      drControllerAddress: 192.168.20.51   # pre-configured in your environment
+      drControllerAddress: 10.10.20.10     # pre-configured in your environment
       drControllerPort: '30863'            # replace with Secondary Cluster NodePort
     - clusterID: cluster-prod
-      drControllerAddress: 192.168.0.10    # pre-configured in your environment
+      drControllerAddress: 10.10.10.10     # pre-configured in your environment
       drControllerPort: '30913'            # replace with Primary Cluster NodePort
   backupClusterScopeCRD: true
   counterMissTolerance: 5
