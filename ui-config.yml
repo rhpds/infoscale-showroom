@@ -12,5 +12,5 @@ view_switcher:
 
 tabs:
   - name: Terminal
-    port: 3000
     path: /wetty
+    port: 443
