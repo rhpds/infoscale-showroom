@@ -1,19 +1,13 @@
-* xref:index.adoc[What is Showroom?]
+* xref:index.adoc[Home]
+* xref:01-overview.adoc[Workshop overview]
+* xref:02-details.adoc[Workshop details]
 
-.Content Developer Guide
-* xref:quick-start.adoc[Quick Start]
-* xref:content-repo.adoc[Creating a Content Repository]
-* xref:agnosticv-config.adoc[AgnosticV Configuration]
-* xref:ui-config.adoc[UI Configuration]
-* xref:user-data.adoc[User Data and Variables]
-* xref:attribute-example.adoc[Attribute Injection Example]
-* xref:ocp4-role-reference.adoc[OCP4 Role Reference]
-* xref:vm-role-reference.adoc[VM Role Reference]
-
-.Showroom Developer Guide
-* xref:architecture.adoc[Architecture]
-* xref:deployer.adoc[Showroom Deployer]
-* xref:images.adoc[Showroom Images]
-* xref:nookbag.adoc[Nookbag UI]
-* xref:ocp-integration.adoc[OCP Integration]
-* xref:contributing.adoc[Contributing]
+.Modules
+* xref:03-introduction.adoc[Introduction]
+* xref:04-module-01-verifying-environment.adoc[Module 1: Verifying the environment]
+* xref:05-module-02-installing-dr-components.adoc[Module 2: Installing DR components]
+* xref:06-module-03-validating-healthcare-vm.adoc[Module 3: Validating the Healthcare VM Application]
+* xref:07-module-04-configuring-dr.adoc[Module 4: Configuring disaster recovery]
+* xref:08-module-05-testing-dr.adoc[Module 5: Testing disaster recovery]
+* xref:09-module-06-failback.adoc[Module 6: Failback to primary cluster (optional)]
+* xref:10-conclusion.adoc[Conclusion and next steps]

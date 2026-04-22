@@ -1,0 +1,66 @@
+= Workshop details
+include::partial$_attributes.adoc[]
+:icons: font
+
+== Timing and schedule
+
+=== Full workshop (90 minutes)
+
+* **Module 1**: Verifying the environment (10 minutes)
+* **Module 2**: Installing DR components (15 minutes)
+* **Module 3**: Validating the Healthcare VM Application (10 minutes)
+* **Module 4**: Configuring disaster recovery (20 minutes)
+* **Module 5**: Testing disaster recovery (20 minutes)
+* **Module 6**: Failback to primary cluster -- optional (15 minutes)
+
+== Technical requirements
+
+=== Software versions
+
+* Red Hat OpenShift {ocp_version}
+* OpenShift Virtualization {ocpv_version}
+* InfoScale for Kubernetes {infoscale_version}
+* OpenShift CLI (`oc`) 4.21 or later
+
+=== Environment access
+
+This workshop uses two pre-configured SNO (Single Node OpenShift) clusters:
+
+[cols="1,2",options="header"]
+|===
+|Cluster |Role
+
+|`{primary_cluster}`
+|Primary production cluster
+
+|`{secondary_cluster}`
+|Secondary disaster recovery cluster
+|===
+
+Both clusters are accessible as cluster-admin. Credentials are available in the lab interface.
+
+=== Network requirements
+
+* Terminal access to both clusters via the `oc` CLI (provided in the lab interface)
+* Both clusters are pre-configured to reach each other over the network
+
+== Environment setup
+
+=== Pre-lab checklist
+
+Before beginning Module 1, confirm the following:
+
+* [ ] Terminal session open in the lab interface
+* [ ] `oc` CLI available -- run `oc version`
+* [ ] Logged into `{primary_cluster}` -- run `oc whoami`
+* [ ] Cluster-admin access confirmed -- run `oc auth can-i '*' '*' --all-namespaces`
+
+NOTE: InfoScale for Kubernetes {infoscale_version} is pre-installed on both clusters. You will verify the installation in Module 1 before proceeding with DR configuration.
+
+== Authors and contributors
+
+**Workshop Authors**: Joseph D'Angelo, Director of Product Management | Marcelo Gigliotti, Sr. Principal Product Manager +
+**Last Updated**: April 2026 +
+**Workshop Version**: 1.0
+
+For feedback or corrections, submit an issue via the Red Hat Demo Platform workshop repository.

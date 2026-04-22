@@ -1,0 +1,96 @@
+= Conclusion and next steps
+include::partial$_attributes.adoc[]
+
+Congratulations! You have completed the Multi-Site Disaster Recovery for Healthcare Systems with InfoScale & OpenShift Virtualization workshop.
+
+You've worked through a realistic scenario as a Platform Engineer at the OpenMRS Foundation -- configuring, testing, and validating an enterprise-grade disaster recovery solution that protects critical patient management workloads running on OpenShift Virtualization {ocpv_version}.
+
+== What you've learned
+
+Throughout this workshop, you've gained hands-on experience with:
+
+* ✅ Verifying a healthy InfoScale for Kubernetes {infoscale_version} installation using the `InfoScaleCluster` CRD across multiple OpenShift clusters
+* ✅ Installing the InfoScale DR Manager via OLM Subscription and establishing inter-cluster communication using `GlobalClusterMembership` custom resources
+* ✅ Deploying and exposing a healthcare VM workload on OpenShift Virtualization using Kubernetes Services and OpenShift Routes
+* ✅ Configuring asynchronous data replication for VM workloads using the `DataReplication` CRD
+* ✅ Creating and managing a `DisasterRecoveryPlan` with a manual failover policy using Kubernetes-native tooling
+* ✅ Executing a manual workload failover from `{primary_cluster}` to `{secondary_cluster}` and validating data consistency post-failover
+* ✅ Performing a complete failback to restore operations to the primary cluster, demonstrating the full DR lifecycle
+
+You now have the skills to design, configure, and validate a multi-site DR solution for stateful VM workloads on OpenShift Virtualization using InfoScale for Kubernetes.
+
+== Key takeaways
+
+The most important concepts to carry forward from this workshop:
+
+. **DR operations are Kubernetes-native CRDs**: InfoScale exposes all disaster recovery operations -- cluster membership, replication, failover, and failback -- through standard Kubernetes custom resources. This means DR workflows integrate naturally with existing `oc` CLI skills, RBAC, and GitOps pipelines.
+
+. **Replication protects data, not cluster-scoped resources**: The `DataReplication` CRD replicates persistent volume data between clusters. Cluster-scoped resources such as Services and OpenShift Routes are not replicated and must be recreated on the secondary cluster after a failover -- as you did in Module 5.
+
+. **Sequential prerequisites determine DR success**: Each phase of the DR lifecycle builds on the previous one. Skipping verification steps -- such as confirming `Data Status: consistent, up-to-date` before failover, or waiting for `GlobalClusterMembership` to show `CONNECTED` -- leads to incomplete or failed DR operations.
+
+. **Failover and failback use the same mechanism**: The `oc patch` command on the `DisasterRecoveryPlan` drives workload migration in both directions. Changing `primaryCluster` from `cluster-prod` to `cluster-dr` triggers failover; reversing the patch triggers failback. No separate tooling or procedure is required.
+
+. **Data consistency validation closes the DR loop**: Infrastructure checks (pod status, CRD status) confirm the mechanism is working. Application-level validation -- verifying that the James Martinez appointment record was intact after failover -- proves that near-zero data loss through continuous non-periodic replication was achieved and provides the evidence needed for compliance audits.
+
+== Next steps
+
+=== Visit our booth
+
+Want to see the full InfoScale for Kubernetes installation and configuration process that is not covered in this lab? Stop by the booth for a live demo with our engineers walking you through the complete setup from scratch.
+
+=== Talk to our speakers and exhibitors
+
+Connect with our team at the event to discuss:
+
+* How InfoScale for Kubernetes fits your organization's DR strategy
+* Licensing, sizing, and deployment options for production environments
+* Integration with your existing OpenShift and storage infrastructure
+* Roadmap and upcoming features for OpenShift Virtualization support
+
+
+== References
+
+=== Official product documentation
+
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/[Red Hat OpenShift Container Platform 4.21 documentation^] -- used across all modules
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/virtualization/[OpenShift Virtualization 4.21 documentation^] -- used in Modules 1, 3, 5
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/operators/understanding-operators[OpenShift OperatorLifecycleManager (OLM) documentation^] -- used in Module 2
+
+=== InfoScale resources
+
+* link:https://www.veritas.com/support/en_US/InfoScale.html[InfoScale for Kubernetes product documentation^] -- used in Modules 1, 2, 4, 5, 6
+
+NOTE: Verify that the documentation URL above resolves correctly for InfoScale {infoscale_version}. The URL may vary by product version.
+
+=== Community and open source
+
+* link:https://openmrs.org[OpenMRS -- open-source patient management platform^] -- business scenario reference used throughout the workshop
+* link:https://operatorhub.io[OperatorHub.io^] -- community resource for discovering certified and community Kubernetes operators
+
+=== Additional reading
+
+* link:https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/storage/[OpenShift Container Platform storage documentation^] -- StorageClasses, PersistentVolumes, and access modes
+* link:https://developers.redhat.com/topics/kubernetes[Red Hat Developer -- Kubernetes and OpenShift resources^] -- developer guides, tutorials, and blog posts
+
+== Share your feedback
+
+Help us improve this workshop:
+
+* What did you find most valuable?
+* What could be improved?
+* What topics would you like to see in future workshops?
+
+Submit feedback via the Red Hat Demo Platform service page for this lab.
+
+== Thank you!
+
+Thank you for participating in this workshop. The skills you've built today -- Kubernetes-native DR configuration, replication management, and application-level validation -- apply directly to protecting real-world healthcare and enterprise workloads on OpenShift Virtualization.
+
+Keep building, keep learning.
+
+---
+
+**Workshop**: Multi-Site Disaster Recovery for Healthcare Systems with InfoScale & OpenShift Virtualization +
+**Completed**: {localdate} +
+**Platform**: Red Hat Showroom

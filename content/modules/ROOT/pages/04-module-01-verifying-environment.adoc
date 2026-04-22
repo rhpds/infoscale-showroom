@@ -1,0 +1,136 @@
+= Module 1: Verifying the environment
+include::partial$_attributes.adoc[]
+:source-highlighter: rouge
+:toc: macro
+:toclevels: 1
+
+toc::[]
+
+The OpenMRS Foundation's DR solution can only be as reliable as the infrastructure it runs on. Before configuring any disaster recovery workflows, you need to confirm that InfoScale for Kubernetes is healthy on both clusters and that the required storage configuration is in place.
+
+In this module, you'll verify the InfoScale installation on both the primary cluster (`{primary_cluster}`) and the secondary DR cluster (`{secondary_cluster}`), and confirm that the required StorageClass is available for DR workloads.
+
+NOTE: The expected outputs shown throughout this lab are examples captured from a reference environment. Your output may display different pod names, IP addresses, or timestamps. What matters is the context and status -- for example, that pods are in `Running` state and resources show the expected status.
+
+== Learning objectives
+
+By the end of this module, you'll be able to:
+
+* Confirm that InfoScale for Kubernetes pods are running and healthy on both clusters
+* Interpret the `InfoScaleCluster` custom resource status to validate cluster readiness
+* Verify that the required InfoScale StorageClass is present and available for DR workloads
+
+== Exercise A: Verify InfoScale installation on the primary cluster
+
+The OpenMRS Foundation's primary production workloads run on `{primary_cluster}`. Before configuring DR, confirm that InfoScale for Kubernetes {infoscale_version} is fully operational here.
+
+. Verify that the InfoScale pods are running:
++
+[source,role="execute"]
+----
+oc get pods -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME                                      READY   STATUS    RESTARTS   AGE
+infoscale-operator-<id>                   1/1     Running   0          2d
+infoscale-csi-controller-<id>             2/2     Running   0          2d
+infoscale-csi-node-<id>                   3/3     Running   0          2d
+----
++
+
+. Check the InfoScale Cluster status:
++
+[source,role="execute"]
+----
+oc get infoscalecluster -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME              STATUS   AGE
+infoscalecluster  Ready    2d
+----
+
+== Exercise B: Verify InfoScale installation on the secondary cluster
+
+The secondary DR cluster (`{secondary_cluster}`) must also have a healthy InfoScale installation. Failover cannot succeed if the destination cluster has infrastructure issues.
+
+Switch your `oc` context to the secondary cluster before running these commands. Your lab environment provides context switching instructions in the terminal.
+
+. Verify that the InfoScale pods are running:
++
+[source,role="execute"]
+----
+oc get pods -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME                                      READY   STATUS    RESTARTS   AGE
+infoscale-operator-<id>                   1/1     Running   0          2d
+infoscale-csi-controller-<id>             2/2     Running   0          2d
+infoscale-csi-node-<id>                   3/3     Running   0          2d
+----
++
+
+. Check the InfoScale Cluster status:
++
+[source,role="execute"]
+----
+oc get infoscalecluster -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME              STATUS   AGE
+infoscalecluster  Ready    2d
+----
+
+== Exercise C: Verify storage configuration
+
+The `{infoscale_storageclass}` StorageClass is required to provision volumes for the OpenMRS healthcare VM workloads. It must be present and available on **both clusters** before you configure data replication in Module 4.
+
+WARNING: This exercise must be performed on both clusters. Switch your `oc` context between steps A and B.
+
+=== Primary cluster ({primary_cluster})
+
+. List the available StorageClasses:
++
+[source,role="execute"]
+----
+oc get storageclass
+----
++
+Confirm that `{infoscale_storageclass}` appears in the output. The provisioner column should reference an InfoScale provisioner.
+
+=== Secondary cluster ({secondary_cluster})
+
+. Switch your `oc` context to `{secondary_cluster}` and list the available StorageClasses:
++
+[source,role="execute"]
+----
+oc get storageclass
+----
++
+Confirm that `{infoscale_storageclass}` is also present on the secondary cluster.
+
+== Learning outcomes
+
+By completing this module, you should now understand:
+
+* How to confirm that InfoScale for Kubernetes is operational using the `InfoScaleCluster` CRD
+* What a healthy InfoScale pod deployment looks like in the `{infoscale_namespace}` namespace
+* Why verifying storage configuration on both clusters is a prerequisite for DR setup
+* The baseline environment state required before proceeding with DR component installation
+
+== Module summary
+
+You have verified the lab environment. Both clusters are running InfoScale for Kubernetes {infoscale_version} with all pods in a healthy state, and the `{infoscale_storageclass}` StorageClass is available on both `{primary_cluster}` and `{secondary_cluster}`. The environment is ready for the next phase.
+
+xref:05-module-02-installing-dr-components.adoc[Continue to Module 2: Installing DR components]

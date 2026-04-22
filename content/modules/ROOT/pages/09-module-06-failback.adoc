@@ -1,0 +1,99 @@
+= Module 6: Failback to primary cluster (optional)
+include::partial$_attributes.adoc[]
+:source-highlighter: rouge
+:toc: macro
+:toclevels: 1
+
+toc::[]
+
+A complete DR solution doesn't end at failover. When the primary site is restored, operations need to return to their original infrastructure -- a process called failback. In this optional module, you'll migrate the OpenMRS workload from `{secondary_cluster}` back to `{primary_cluster}`, completing the full DR lifecycle: initial replication, failover, and failback.
+
+IMPORTANT: All exercises in this module must be performed on the **secondary cluster (`{secondary_cluster}`)** only.
+
+NOTE: All YAML files required for this module are pre-loaded in the lab working directory. You do not need to type them -- simply execute the commands as instructed.
+
+NOTE: The expected outputs shown throughout this lab are examples captured from a reference environment. Your output may display different values for pod names, IP addresses, or timestamps. What matters is the context and status.
+
+== Learning objectives
+
+By the end of this module, you'll be able to:
+
+* Interpret DataReplication status to confirm reverse replication is active before initiating failback
+* Execute a failback by patching the `DisasterRecoveryPlan` to restore the original primary cluster designation
+* Describe the complete DR lifecycle -- replication, failover, and failback -- as orchestrated through Kubernetes-native InfoScale CRDs
+
+== Exercise A: Verify replication status on the secondary cluster
+
+After the failover in Module 4, InfoScale automatically reversed the replication direction -- data changes made on `{secondary_cluster}` are now being replicated back to `{primary_cluster}`. Before initiating failback, confirm that this reverse replication is active and data is fully synchronized.
+
+. Describe the DataReplication resource to check the current replication status:
++
+[source,role="execute"]
+----
+oc describe datareplication -n infoscale-vtas
+----
++
+In the output, confirm the following fields before proceeding:
++
+* `Data Status`: `consistent, up-to-date`
+* `Replication Status`: `replicating (connected)`
+
+IMPORTANT: Do not proceed with failback until `Data Status` shows `consistent, up-to-date` and `Replication Status` shows `replicating (connected)`. This confirms all data changes made on `{secondary_cluster}` have been synchronized to `{primary_cluster}` and no data will be lost during failback.
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `Data Status` is `consistent, up-to-date`
+* `Replication Status` is `replicating (connected)`
+
+== Exercise B: Failback workload to the primary cluster
+
+With replication confirmed, initiate the failback by updating the `DisasterRecoveryPlan` to designate `{primary_cluster}` as the primary cluster again. InfoScale DR Manager will orchestrate the workload migration back to the original site.
+
+. Initiate the failback by patching the DisasterRecoveryPlan on `{secondary_cluster}`:
++
+[source,role="execute"]
+----
+oc patch disasterrecoveryplan openmrs-recoveryplan \
+  -n infoscale-vtas \
+  --type=merge \
+  -p '{"spec":{"primaryCluster":"cluster-prod"}}'
+----
+
+. Verify the failback status:
++
+[source,role="execute"]
+----
+oc get disasterrecoveryplan -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME                  AGE
+openmrs-recoveryplan  <age>
+----
+
+=== Verify
+
+Confirm the following:
+
+* The `oc patch` command completed without error
+* `openmrs-recoveryplan` is present and active in the `{infoscale_namespace}` namespace on `{secondary_cluster}`
+* The OpenMRS VM is running on `{primary_cluster}` (switch context and run `oc get vms -n openmrs` to confirm)
+
+== Learning outcomes
+
+By completing this module, you should now understand:
+
+* Why verifying reverse replication status is a mandatory prerequisite before initiating failback -- proceeding without confirmation risks data loss
+* How the same `oc patch` mechanism used for failover also drives failback, with only the `primaryCluster` value changing direction
+* That InfoScale DR Manager is symmetric -- it orchestrates workload movement in both directions using the same `DisasterRecoveryPlan` resource
+* How the complete DR lifecycle (configure replication, failover, failback) maps to Kubernetes-native CRD operations with no proprietary tooling required
+
+== Module summary
+
+You have completed the failback scenario, returning the OpenMRS healthcare VM workload from `{secondary_cluster}` back to `{primary_cluster}`. This demonstrates the full lifecycle of disaster recovery with InfoScale for Kubernetes: initial replication configuration, failover to the DR site, and failback to the restored primary cluster -- all orchestrated through Kubernetes-native custom resources.
+
+xref:10-conclusion.adoc[Continue to Conclusion]

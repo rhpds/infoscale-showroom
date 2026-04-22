@@ -1,0 +1,63 @@
+= Introduction
+include::partial$_attributes.adoc[]
+:icons: font
+
+Welcome to this hands-on lab, part of the **Red Hat Summit** technical session track, focused on enterprise-grade disaster recovery for virtualized workloads running on **Red Hat OpenShift Virtualization**.
+
+== Lab overview
+
+As organizations modernize their infrastructure, virtual machines are increasingly being migrated from traditional hypervisors to Kubernetes-based platforms such as **Red Hat OpenShift Virtualization**. This shift brings significant operational advantages -- consolidated infrastructure, unified management, and cloud-native workflows -- but it also introduces new challenges for **Business Continuity and Disaster Recovery** strategies.
+
+Traditional DR solutions were not designed with Kubernetes workloads in mind, leaving a critical gap for stateful applications running inside virtual machines on OpenShift. Organizations need a solution that can protect VM-based workloads natively within the Kubernetes ecosystem, without sacrificing the reliability and recovery guarantees that mission-critical applications demand.
+
+This lab addresses that gap by demonstrating how **InfoScale for Kubernetes** delivers a Kubernetes-native disaster recovery solution for virtual machines running on OpenShift Virtualization {ocpv_version}.
+
+== Why InfoScale for Kubernetes?
+
+InfoScale for Kubernetes is an enterprise storage and availability platform purpose-built for Kubernetes environments. It delivers software-defined storage, persistent volume management, and advanced replication capabilities that integrate natively with OpenShift and the Kubernetes ecosystem.
+
+In the context of disaster recovery for OpenShift Virtualization, InfoScale provides:
+
+* **Kubernetes-native replication** -- Data replication is orchestrated through Custom Resource Definitions (CRDs), fully integrated with the OpenShift control plane
+* **Synchronous and asynchronous replication** -- Flexible replication modes to meet different RPO and RTO requirements
+* **Application-consistent protection** -- Persistent volumes backing VM disks are replicated with full data consistency
+* **Automated failover orchestration** -- The InfoScale DR Manager coordinates workload migration between clusters with minimal manual intervention
+* **Seamless integration with OpenShift Virtualization** -- VMs managed by KubeVirt are protected and recovered as first-class Kubernetes workloads
+
+== Lab architecture
+
+The lab environment consists of two **Single Node OpenShift (SNO)** clusters representing a primary site and a secondary disaster recovery site:
+
+* **Primary cluster -- `{primary_cluster}`**: Hosts the running healthcare VM application and acts as the active replication source
+* **Secondary cluster -- `{secondary_cluster}`**: Acts as the disaster recovery target site, receiving replicated data from the primary cluster
+
+Both clusters are equipped with **InfoScale Software Defined Storage** {infoscale_version} providing persistent storage backed by enterprise-grade disk groups. The **InfoScale DR Manager** orchestrates replication and failover operations across both clusters through a dedicated control plane communication channel.
+
+// TODO: Insert lab architecture diagram
+image::introduction-architecture.png[Diagram showing cluster-prod as primary site connected to cluster-dr as secondary site via InfoScale DR Manager replication channel,link=self,window=blank,width=800,title="Lab architecture -- dual SNO cluster DR topology"]
+
+== Lab objectives
+
+By the end of this lab, you will be able to:
+
+* Verify the InfoScale for Kubernetes installation across both clusters
+* Install and configure the InfoScale DR Manager and establish inter-cluster communication
+* Validate a stateful healthcare VM application running on OpenShift Virtualization
+* Configure asynchronous data replication between the primary and secondary clusters
+* Create and execute a disaster recovery plan using InfoScale CRDs
+* Validate application availability and data consistency after a DR failover
+
+
+== Prerequisites
+
+No prior experience with InfoScale for Kubernetes is required. You should have a basic understanding of:
+
+* OpenShift and the `oc` CLI
+* Kubernetes core concepts (Pods, PersistentVolumes, Namespaces, Custom Resources)
+* Virtual machines on OpenShift Virtualization (KubeVirt)
+
+All lab environments are pre-configured and ready to use. YAML manifests are pre-loaded in the lab working directory -- they are provided for reference only and do not need to be typed.
+
+== Let's get started!
+
+xref:04-module-01-verifying-environment.adoc[Proceed to Module 1: Verifying the environment]

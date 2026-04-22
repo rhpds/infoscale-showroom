@@ -1,0 +1,62 @@
+= Workshop overview
+include::partial$_attributes.adoc[]
+:icons: font
+
+== Your role and mission
+
+You're a Platform Engineer at the OpenMRS Foundation, a global open-source organization whose patient management systems power hospitals and clinics worldwide. Clinical staff in multiple countries depend on these systems 24/7 to access critical patient records, administer medication, and coordinate care.
+
+The OpenMRS Foundation has invested in a dual-cluster OpenShift Virtualization environment -- a primary production cluster (`{primary_cluster}`) and a geographically separate disaster recovery cluster (`{secondary_cluster}`). Your manager has made the stakes clear: "We need near-zero data loss through continuous non-periodic replication and the ability to restore patient access within minutes of any infrastructure failure. Healthcare regulations require it, and patient safety depends on it."
+
+**Your assignment**: Configure and validate a complete multi-site disaster recovery solution using InfoScale for Kubernetes, ensuring that critical healthcare VMs can failover seamlessly between clusters.
+
+**The objective**: Demonstrate that the OpenMRS patient management platform can survive a complete cluster failure and remain available to clinical staff.
+
+== Success criteria for your mission
+
+By the end of this workshop, you'll have hands-on skills to address real-world healthcare DR requirements:
+
+* Verify a healthy InfoScale for Kubernetes installation across both clusters -- confirm the DR foundation is solid
+* Install and configure the InfoScale DR Manager -- enable cross-cluster DR orchestration
+* Deploy the healthcare VM application on OpenShift Virtualization -- establish the workload to protect
+* Configure asynchronous data replication using InfoScale CRDs -- protect patient data continuously
+* Execute a manual DR failover -- prove the system works when it matters most
+* Validate data consistency after failover -- confirm no patient records were lost
+
+**Technical outcome**: A fully configured and tested DR pipeline protecting healthcare VM workloads across two OpenShift {ocp_version} clusters running InfoScale {infoscale_version}.
+
+**Business benefit**: Compliance with healthcare uptime and data integrity regulations, and confidence that patient care systems remain available during infrastructure failures.
+
+== Target audience
+
+This workshop is designed for:
+
+* Platform Engineers responsible for OpenShift cluster operations and DR strategy
+* Storage Administrators managing InfoScale deployments in Kubernetes environments
+* Site Reliability Engineers (SREs) building resilient healthcare platforms
+* OpenShift and OpenShift Virtualization Architects evaluating enterprise DR solutions
+
+== What you need to succeed
+
+You should have:
+
+* Familiarity with the `oc` CLI and Kubernetes resource management
+* Basic understanding of Kubernetes custom resources (CRDs)
+* Understanding of storage concepts (PVCs, StorageClasses, replication)
+* Cluster-admin access to both `{primary_cluster}` and `{secondary_cluster}`
+
+== The OpenMRS Foundation's DR challenge
+
+**The situation**: The OpenMRS Foundation operates patient management VMs critical to clinical workflows across partner hospitals and clinics worldwide.
+
+**Regulatory context**: Healthcare data regulations require continuous availability and near-zero data loss through continuous non-periodic replication for patient records. A prolonged outage or data loss event carries serious compliance and patient safety consequences.
+
+**Current risk areas**:
+
+* **Single point of failure**: Without a tested DR plan, a cluster failure could take patient systems offline for hours
+* **Data exposure**: Asynchronous replication must be configured correctly to prevent loss of recent patient records during failover
+* **Recovery complexity**: Manual failover without Kubernetes-native tooling increases recovery time and human error risk
+* **Compliance gaps**: Unvalidated DR procedures do not satisfy healthcare audit requirements
+
+**The opportunity**: InfoScale for Kubernetes brings enterprise storage DR capabilities natively into OpenShift, allowing the Foundation to protect VM workloads using the same Kubernetes CRDs the team already uses for application management.
+

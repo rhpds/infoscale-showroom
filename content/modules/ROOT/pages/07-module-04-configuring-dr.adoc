@@ -1,0 +1,255 @@
+= Module 4: Configuring disaster recovery
+include::partial$_attributes.adoc[]
+:source-highlighter: rouge
+:toc: macro
+:toclevels: 1
+
+toc::[]
+
+With the OpenMRS patient management VM running and the DR control plane connected, the OpenMRS Foundation is ready to protect its healthcare workload. In this module, you'll configure asynchronous data replication from `{primary_cluster}` to `{secondary_cluster}`, create a `DisasterRecoveryPlan`, and trigger a workload migration to validate that the DR configuration is complete.
+
+IMPORTANT: All exercises in this module must be performed on the **primary cluster (`{primary_cluster}`)** only.
+
+NOTE: All YAML files required for this module are pre-loaded in the lab working directory. You do not need to type them -- simply execute the `oc apply` and `oc create` commands as instructed.
+
+NOTE: The expected outputs shown throughout this lab are examples captured from a reference environment. Your output may display different values for IP addresses, timestamps, or resource identifiers. What matters is the context and status.
+
+== Learning objectives
+
+By the end of this module, you'll be able to:
+
+* Create a `DataReplication` custom resource to configure asynchronous replication of a namespace between clusters
+* Interpret the `DataReplication` status to confirm that replication is active and data is consistent
+* Create a `DisasterRecoveryPlan` that defines the failover policy and target cluster
+* Trigger a workload migration by patching the `DisasterRecoveryPlan` using the `oc patch` command
+
+== Exercise A: Configure data replication
+
+The `DataReplication` resource tells InfoScale to replicate the persistent data in the `openmrs` namespace asynchronously from `{primary_cluster}` to `{secondary_cluster}`. This continuous non-periodic replication meets the OpenMRS Foundation's near-zero data loss requirement.
+
+. Apply the DataReplication manifest on `{primary_cluster}`:
++
+[source,yaml]
+----
+apiVersion: infoscale.veritas.com/v1
+kind: DataReplication
+metadata:
+  name: openmrs-datarep
+  namespace: infoscale-vtas
+spec:
+  lbEnabled: false
+  remoteClusterDetails:
+    - remoteLbEnabled: false
+      remoteCloudVendor: Local
+      clusterName: cluster-dr
+      latencyProtection: disable
+      logProtection: autodcm
+      networkTransportProtocol: TCP
+      remoteHostAddress: 192.168.20.200   # pre-configured in your environment
+      remoteNIC: br-ex
+      remoteNetMask: 255.255.255.0
+      replicationState: start
+      replicationType: async
+  cloudVendor: Local
+  selector:
+    namespace: openmrs
+  currentPrimary: cluster-prod
+  force: false
+  localHostAddress: 192.168.20.201        # pre-configured in your environment
+  localNIC: ens256
+  localNetMask: 255.255.255.0
+----
++
+[source,role="execute"]
+----
+oc apply -f infoscale-dr-datarep.yaml -n infoscale-vtas
+----
+
+. Verify that the DataReplication resource was created:
++
+[source,role="execute"]
+----
+oc get datareplication -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME              AGE
+openmrs-datarep   30s
+----
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `openmrs-datarep` DataReplication resource is present in the `{infoscale_namespace}` namespace
+
+== Exercise B: Verify replication status
+
+Initial synchronization copies the existing data in the `openmrs` namespace to `{secondary_cluster}`. After synchronization completes, ongoing writes are replicated asynchronously.
+
+. Describe the DataReplication resource to check the current replication status:
++
+[source,role="execute"]
+----
+oc describe datareplication -n infoscale-vtas
+----
++
+Look for the `Data Status` field in the output. Wait until it shows `consistent, up-to-date` before proceeding.
+
+.Expected output
+[source,text]
+----
+Name:         openmrs-datarep
+Namespace:    infoscale-vtas
+Labels:       velero.io/exclude-from-backup=true
+Annotations:  <none>
+API Version:  infoscale.veritas.com/v1
+Kind:         DataReplication
+Spec:
+  Cloud Vendor:        Local
+  Current Primary:     cluster-prod
+  Force:               false
+  LB Enabled:          false
+  Local Host Address:  192.168.0.43
+  Local NIC:           br-ex
+  Local Net Mask:      255.255.255.0
+  Remote Cluster Details:
+    Bandwidth Limit:             N/A
+    Latency Protection:          disable
+    Log Protection:              autoln
+    Network Transport Protocol:  TCP
+    Remote Host Address:         192.168.0.42
+    Remote NIC:                  br-ex
+    Replication State:           start
+    Replication Type:            async
+  Selector:
+    Namespace:  openmrs
+Status:
+  Current Primary:  cluster-prod
+  Current Details:
+    Phase:           ReplicationStartedSuccessfully
+    Primary Status:
+      Primary Host:   192.168.0.43
+      RVG State:      enabled for I/O
+    Secondary Status:
+      Data Status:                 consistent, up-to-date
+      Replication Mode:            asynchronous
+      Replication State:           start
+      Replication Status:          replicating (connected)
+      Secondary Host:              192.168.0.42
+      State:                       behind by 0m 0s
+----
+
+IMPORTANT: Initial replication synchronization may take approximately **5 to 10 minutes** to complete. Wait until `Data Status` shows `consistent, up-to-date` before proceeding to Exercise C.
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `oc describe datareplication` shows `Data Status: consistent, up-to-date`
+* Replication target is `{secondary_cluster}`
+
+== Exercise C: Create DisasterRecoveryPlan
+
+The `DisasterRecoveryPlan` defines which workload to protect, the preferred cluster priority, and the failover policy. Using `Manual` failover policy ensures no unintended switchovers occur without an explicit operator action.
+
+. Apply the DisasterRecoveryPlan manifest on `{primary_cluster}`:
++
+[source,yaml]
+----
+apiVersion: infoscale.veritas.com/v1
+kind: DisasterRecoveryPlan
+metadata:
+  name: openmrs-recoveryplan
+  namespace: infoscale-vtas
+spec:
+  preferredClusterList:
+    - cluster-prod
+    - cluster-dr
+  selector:
+    namespace: openmrs
+  clusterFailOverPolicy: Manual
+  force: false
+  primaryCluster: cluster-prod
+  dataReplicationPointer: openmrs-datarep
+----
++
+[source,role="execute"]
+----
+oc create -f infoscale-dr-recoveryplan.yaml
+----
+
+. Verify that the DisasterRecoveryPlan was created:
++
+[source,role="execute"]
+----
+oc get disasterrecoveryplan -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME                  AGE
+openmrs-recoveryplan  30s
+----
+
+IMPORTANT: Wait approximately **5 minutes** after creating the DisasterRecoveryPlan before proceeding to Exercise D. This allows the plan metadata to synchronize between `{primary_cluster}` and `{secondary_cluster}`.
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `openmrs-recoveryplan` DisasterRecoveryPlan is present in the `{infoscale_namespace}` namespace
+* 5 minutes have elapsed since creation to allow metadata synchronization
+
+== Exercise D: Migrate workload to the secondary cluster
+
+With replication active and the DR plan in place, you'll now trigger a migration of the `openmrs` workload to `{secondary_cluster}` by updating the `primaryCluster` field in the DisasterRecoveryPlan. This simulates the action an operator would take during a planned maintenance window or an actual DR event.
+
+. Initiate the migration by patching the DisasterRecoveryPlan to designate `{secondary_cluster}` as the new primary:
++
+[source,role="execute"]
+----
+oc patch disasterrecoveryplan openmrs-recoveryplan \
+  -n infoscale-vtas \
+  --type=merge \
+  -p '{"spec":{"primaryCluster":"cluster-dr"}}'
+----
+
+. Monitor the migration status:
++
+[source,role="execute"]
+----
+oc get disasterrecoveryplan -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME                  AGE
+openmrs-recoveryplan  6m
+----
+
+=== Verify
+
+Confirm the following before continuing:
+
+* The `oc patch` command completed without error
+* `oc get disasterrecoveryplan` shows `openmrs-recoveryplan` is present and active
+
+== Learning outcomes
+
+By completing this module, you should now understand:
+
+* How the `DataReplication` CRD configures asynchronous replication between InfoScale clusters, including network interface and replication mode settings
+* How to interpret `DataReplication` status output to confirm data consistency before proceeding with DR operations
+* How the `DisasterRecoveryPlan` ties together a namespace selector, replication source, cluster preference list, and failover policy into a single Kubernetes-native resource
+* How `oc patch` with `--type=merge` updates a specific field in a custom resource to trigger a workload migration
+
+== Module summary
+
+You have successfully configured disaster recovery for the OpenMRS healthcare VM application. The `openmrs-datarep` DataReplication resource is replicating the `openmrs` namespace asynchronously from `{primary_cluster}` to `{secondary_cluster}`. The `openmrs-recoveryplan` DisasterRecoveryPlan has been created with a manual failover policy, and the workload migration to `{secondary_cluster}` has been triggered. The environment is now ready for DR validation.
+
+xref:08-module-05-testing-dr.adoc[Continue to Module 5: Testing disaster recovery]

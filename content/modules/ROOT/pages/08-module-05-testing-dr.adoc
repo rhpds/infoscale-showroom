@@ -1,0 +1,190 @@
+= Module 5: Testing disaster recovery
+include::partial$_attributes.adoc[]
+:source-highlighter: rouge
+:toc: macro
+:toclevels: 1
+
+toc::[]
+
+This is the moment the OpenMRS Foundation has been preparing for. In this module, you'll validate the end-to-end disaster recovery execution on `{secondary_cluster}`. You'll confirm that the healthcare VM migrated successfully, re-expose the application service, and verify that the patient appointment record created in Module 3 is fully intact -- proving that InfoScale's asynchronous replication delivered near-zero data loss through continuous non-periodic replication.
+
+IMPORTANT: All exercises in this module must be performed on the **secondary cluster (`{secondary_cluster}`)** only.
+
+NOTE: All YAML files required for this module are pre-loaded in the lab working directory. You do not need to type them -- simply execute the commands as instructed.
+
+NOTE: The expected outputs shown throughout this lab are examples captured from a reference environment. Your output may display different pod names, IP addresses, or timestamps. What matters is the context and status.
+
+== Learning objectives
+
+By the end of this module, you'll be able to:
+
+* Confirm that a VirtualMachine workload is running on the DR cluster after a failover
+* Re-expose a VM application service and route on the secondary cluster
+* Validate application data consistency by verifying records created before the failover are intact
+* Interpret a successful end-to-end DR test as confirmation of near-zero data loss through continuous non-periodic replication
+
+== Exercise A: Verify the VM is running on the secondary cluster
+
+After the migration triggered in Module 4, the `openmrs01` VirtualMachine should be running on `{secondary_cluster}`. Confirm this before attempting to expose or access the application.
+
+. Verify that the VirtualMachine is running on the DR site:
++
+[source,role="execute"]
+----
+oc get vms -n openmrs
+----
++
+Expected output:
++
+----
+NAME       AGE   STATUS    READY
+openmrs01  1h    Running   True
+----
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `openmrs01` shows `Running` status and `Ready: True` on `{secondary_cluster}`
+
+== Exercise B: Expose the VM service on the secondary cluster
+
+The Service and Route created in Module 3 existed only on `{primary_cluster}`. You need to recreate them on `{secondary_cluster}` so the application is accessible at the DR site.
+
+. Apply the same service and route manifest used in Module 3:
++
+[source,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcopenmrs
+  namespace: openmrs
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    kubevirt.io/domain: openmrs01
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openmrs
+  namespace: openmrs
+spec:
+  to:
+    kind: Service
+    name: svcopenmrs
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
+----
++
+[source,role="execute"]
+----
+oc apply -f openmrs-exposeport.yaml
+----
+
+. Verify the Service was created:
++
+[source,role="execute"]
+----
+oc get svc svcopenmrs -n openmrs
+----
++
+Expected output:
++
+----
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+svcopenmrs   ClusterIP   10.96.x.x       <none>        80/TCP    30s
+----
+
+. Retrieve the Route URL and **note it down**:
++
+[source,role="execute"]
+----
+oc get route openmrs -n openmrs
+----
++
+Expected output:
++
+----
+NAME      HOST/PORT                                    PATH   SERVICES     PORT   TERMINATION   WILDCARD
+openmrs   openmrs-openmrs.<cluster-dr-ingress-domain>         svcopenmrs   80     edge          None
+----
++
+TIP: Copy the full `HOST/PORT` value and prefix it with `https://` to access the application. Note that this URL will differ from the one used in Module 3 since it resolves to `{secondary_cluster}`.
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `svcopenmrs` Service and `openmrs` Route are present in the `openmrs` namespace on `{secondary_cluster}`
+* You have noted the new Route URL for `{secondary_cluster}`
+
+== Exercise C: Validate healthcare application data
+
+With the application accessible on the DR site, you'll now confirm that the patient appointment record created in Module 3 is present and intact. A successful validation proves that InfoScale's asynchronous replication delivered near-zero data loss through continuous non-periodic replication during the failover.
+
+=== Access the application
+
+. Open a browser and navigate to the Route URL obtained in Exercise B:
++
+----
+https://<route-host-on-cluster-dr>
+----
+
+. Log in using the same demo credentials as in Module 3:
++
+* **Username**: `admin`
+* **Password**: `Admin123`
++
+// TODO: Add screenshot -- OpenMRS login page on cluster-dr
+image::module-05-login-dr.png[OpenMRS login page accessed via the cluster-dr Route URL,link=self,window=blank,width=700,title="OpenMRS login on cluster-dr"]
+
+. On the welcome screen, select **Mobile Clinic**.
++
+// TODO: Add screenshot -- OpenMRS welcome screen on cluster-dr
+image::module-05-welcome-dr.png[OpenMRS welcome screen on the secondary cluster showing Mobile Clinic option,link=self,window=blank,width=700,title="OpenMRS welcome on cluster-dr"]
+
+=== Verify patient data consistency
+
+. From the left-side menu, select **Appointment**.
+
+. In the search field, type `James` and confirm that the appointment record for **James Martinez** -- created in Module 3 on `{primary_cluster}` -- is present on `{secondary_cluster}`.
++
+// TODO: Add screenshot -- Appointment list showing James Martinez record on cluster-dr
+image::module-05-appointment-james.png[Appointment list on the secondary cluster showing the James Martinez record created before failover,link=self,window=blank,width=700,title="James Martinez appointment on cluster-dr"]
+
+. Open the record and confirm that the appointment details match exactly what was created in Module 3.
++
+// TODO: Add screenshot -- Appointment details for James Martinez confirming data consistency
+image::module-05-appointment-details.png[Appointment details for James Martinez confirming full data consistency after DR failover,link=self,window=blank,width=700,title="Data consistency confirmed"]
+
+=== Verify
+
+Confirm the following:
+
+* The OpenMRS application is accessible via the `{secondary_cluster}` Route URL
+* The appointment record for James Martinez is present and its details are intact
+* No data was lost during the DR failover from `{primary_cluster}` to `{secondary_cluster}`
+
+== Learning outcomes
+
+By completing this module, you should now understand:
+
+* How to confirm a successful VM workload migration by checking VirtualMachine status on the DR cluster
+* Why Service and Route resources must be recreated on the secondary cluster after a failover (they are cluster-scoped, not replicated by InfoScale)
+* How application-level data validation provides stronger DR confirmation than infrastructure checks alone
+* What "near-zero data loss through continuous non-periodic replication" means in practice for an asynchronous replication scenario -- and how to demonstrate it with a concrete validation test
+
+== Module summary
+
+Congratulations! You have successfully completed an end-to-end disaster recovery test for OpenShift Virtualization using InfoScale for Kubernetes. The healthcare VM `openmrs01` is now running on `{secondary_cluster}`, and the patient appointment record for James Martinez created in Module 3 is fully intact -- confirming near-zero data loss through continuous non-periodic replication and a successful DR failover.
+
+This validates the OpenMRS Foundation's DR architecture and demonstrates that InfoScale asynchronous replication effectively protects stateful virtual machine workloads on OpenShift Virtualization {ocpv_version}.
+
+xref:09-module-06-failback.adoc[Continue to Module 6: Failback to primary cluster (optional)]

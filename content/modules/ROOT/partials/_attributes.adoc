@@ -1,0 +1,20 @@
+// Showroom runtime attributes -- replaced at deploy time
+:openshift_console_url: {openshift_console_url}
+:openshift_api_url: {openshift_api_url}
+:user: {user}
+:password: {password}
+:cluster_admin_user: {cluster_admin_user}
+:bastion_host: {bastion_public_hostname}
+
+// Lab-specific versions
+:ocp_version: 4.21
+:ocpv_version: 4.21
+:infoscale_version: 9.1.2
+
+// Cluster identifiers
+:primary_cluster: cluster-prod
+:secondary_cluster: cluster-dr
+
+// InfoScale configuration
+:infoscale_namespace: infoscale-vtas
+:infoscale_storageclass: infoscale-rootdisk-sc

@@ -1,0 +1,172 @@
+= Module 3: Validating the Healthcare VM Application
+include::partial$_attributes.adoc[]
+:source-highlighter: rouge
+:toc: macro
+:toclevels: 1
+
+toc::[]
+
+With the DR control plane established, it's time to work with the workload that needs protecting. The OpenMRS Foundation's patient management system runs as a virtual machine on OpenShift Virtualization. In this module, you'll confirm the VM is healthy, expose it via an OpenShift Route, and create a sample patient appointment record that you'll use to validate data consistency after the DR failover in Module 5.
+
+IMPORTANT: All exercises in this module must be performed on the **primary cluster (`{primary_cluster}`)** only.
+
+NOTE: All YAML files required for this module are pre-loaded in the lab working directory. You do not need to type them -- simply execute the `oc apply` commands as instructed.
+
+NOTE: The expected outputs shown throughout this lab are examples captured from a reference environment. Your output may display different pod names, IP addresses, timestamps, or resource identifiers. What matters is the context and status.
+
+== Learning objectives
+
+By the end of this module, you'll be able to:
+
+* Verify that a VirtualMachine is running on OpenShift Virtualization using the `oc` CLI
+* Expose a VM workload using a Kubernetes Service and an OpenShift Route
+* Create application data in the OpenMRS patient management system to serve as a DR validation reference
+
+== Exercise A: Verify the VM is running
+
+Before exposing the application, confirm that the OpenMRS VirtualMachine (`openmrs01`) is running on `{primary_cluster}`.
+
+. Check the VirtualMachine status in the `openmrs` namespace:
++
+[source,role="execute"]
+----
+oc get vms -n openmrs
+----
++
+Expected output:
++
+----
+NAME       AGE   STATUS    READY
+openmrs01  1h    Running   True
+----
+
+=== Verify
+
+Confirm the following before continuing:
+
+* `openmrs01` shows `Running` status and `Ready: True` in the `openmrs` namespace
+
+== Exercise B: Generate sample application data
+
+To validate data consistency after the DR failover in Module 5, you need a known record written to persistent storage. You'll expose the application via an OpenShift Route, then create a patient appointment record that you can verify post-failover.
+
+=== Expose the VM application
+
+. Apply the manifest that creates both a Service and an OpenShift Route for the OpenMRS application:
++
+[source,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcopenmrs
+  namespace: openmrs
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    kubevirt.io/domain: openmrs01
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openmrs
+  namespace: openmrs
+spec:
+  to:
+    kind: Service
+    name: svcopenmrs
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
+----
++
+[source,role="execute"]
+----
+oc apply -f openmrs-exposeport.yaml
+----
+
+. Verify the Service was created:
++
+[source,role="execute"]
+----
+oc get svc svcopenmrs -n openmrs
+----
++
+Expected output:
++
+----
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+svcopenmrs   ClusterIP   10.96.x.x       <none>        80/TCP    30s
+----
+
+. Retrieve the Route URL and **note it down** -- you will need this to access the application and again after the DR failover in Module 5:
++
+[source,role="execute"]
+----
+oc get route openmrs -n openmrs
+----
++
+Expected output:
++
+----
+NAME      HOST/PORT                                   PATH   SERVICES     PORT   TERMINATION   WILDCARD
+openmrs   openmrs-openmrs.<cluster-ingress-domain>          svcopenmrs   80     edge          None
+----
++
+TIP: Copy the full `HOST/PORT` value -- this is your application URL. Prefix it with `https://` to open it in the browser.
+
+=== Access the application and create a patient appointment
+
+. Open a browser and navigate to the application URL from the previous step:
++
+----
+https://<route-host>
+----
+
+. Log in using the following demo credentials:
++
+* **Username**: `admin`
+* **Password**: `Admin123`
++
+// TODO: Add screenshot -- OpenMRS login page
+image::module-03-login.png[OpenMRS login page with admin credentials,link=self,window=blank,width=700,title="OpenMRS login page"]
+
+. On the welcome screen, select **Mobile Clinic** to access the clinic workspace.
++
+// TODO: Add screenshot -- OpenMRS welcome screen with Mobile Clinic selected
+image::module-03-welcome.png[OpenMRS welcome screen showing the Mobile Clinic option,link=self,window=blank,width=700,title="OpenMRS welcome screen"]
+
+. From the left-side menu, select **Appointment**.
+
+. On the right side of the screen, click **Create New Appointment**.
+
+. In the search field, type `James` and select **James Martinez** from the results.
++
+// TODO: Add screenshot -- Appointment creation form with James Martinez selected
+image::module-03-appointment-search.png[Appointment creation form showing James Martinez selected from search results,link=self,window=blank,width=700,title="Appointment search -- James Martinez"]
+
+. Fill in the remaining appointment fields with any available data, then click **Save** to create the record.
++
+// TODO: Add screenshot -- Completed appointment record for James Martinez
+image::module-03-appointment-saved.png[Saved appointment record for James Martinez in the OpenMRS system,link=self,window=blank,width=700,title="Appointment saved"]
++
+The appointment record is written to the persistent volume backing `openmrs01`. This is the data you'll verify is intact after the DR failover in Module 5.
+
+== Learning outcomes
+
+By completing this module, you should now understand:
+
+* How to verify the health of a VirtualMachine resource on OpenShift Virtualization using `oc get vms`
+* How a Kubernetes Service with a `kubevirt.io/domain` selector routes traffic to a VM workload
+* How an OpenShift Route with TLS edge termination exposes a VM application externally
+* Why creating a known data record before DR testing provides a concrete consistency validation reference
+
+== Module summary
+
+You have verified that the OpenMRS VirtualMachine `openmrs01` is running on `{primary_cluster}` and exposed it via an OpenShift Route. A patient appointment record for James Martinez has been created in persistent storage. This record will serve as the data consistency validation reference after the DR failover in Module 5.
+
+xref:07-module-04-configuring-dr.adoc[Continue to Module 4: Configuring disaster recovery]
