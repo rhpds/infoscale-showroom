@@ -27,15 +27,6 @@ By the end of this workshop, you'll have hands-on skills to address real-world h
 
 **Business benefit**: Compliance with healthcare uptime and data integrity regulations, and confidence that patient care systems remain available during infrastructure failures.
 
-== Target audience
-
-This workshop is designed for:
-
-* Platform Engineers responsible for OpenShift cluster operations and DR strategy
-* Storage Administrators managing InfoScale deployments in Kubernetes environments
-* Site Reliability Engineers (SREs) building resilient healthcare platforms
-* OpenShift and OpenShift Virtualization Architects evaluating enterprise DR solutions
-
 == What you need to succeed
 
 You should have:

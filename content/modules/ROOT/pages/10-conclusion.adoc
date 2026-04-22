@@ -59,7 +59,7 @@ Connect with our team at the event to discuss:
 
 === InfoScale resources
 
-* link:https://www.veritas.com/support/en_US/InfoScale.html[InfoScale for Kubernetes product documentation^] -- used in Modules 1, 2, 4, 5, 6
+* link:https://www.veritas.com/support/en_US/doc/168721626-172262377-0/v168721830-172262377[InfoScale for Kubernetes product documentation^] -- used in Modules 1, 2, 4, 5, 6
 
 NOTE: Verify that the documentation URL above resolves correctly for InfoScale {infoscale_version}. The URL may vary by product version.
 

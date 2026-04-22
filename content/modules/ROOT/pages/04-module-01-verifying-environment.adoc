@@ -59,7 +59,6 @@ infoscalecluster  Ready    2d
 
 The secondary DR cluster (`{secondary_cluster}`) must also have a healthy InfoScale installation. Failover cannot succeed if the destination cluster has infrastructure issues.
 
-Switch your `oc` context to the secondary cluster before running these commands. Your lab environment provides context switching instructions in the terminal.
 
 . Verify that the InfoScale pods are running:
 +
@@ -96,7 +95,6 @@ infoscalecluster  Ready    2d
 
 The `{infoscale_storageclass}` StorageClass is required to provision volumes for the OpenMRS healthcare VM workloads. It must be present and available on **both clusters** before you configure data replication in Module 4.
 
-WARNING: This exercise must be performed on both clusters. Switch your `oc` context between steps A and B.
 
 === Primary cluster ({primary_cluster})
 
@@ -111,7 +109,7 @@ Confirm that `{infoscale_storageclass}` appears in the output. The provisioner c
 
 === Secondary cluster ({secondary_cluster})
 
-. Switch your `oc` context to `{secondary_cluster}` and list the available StorageClasses:
+. In the terminal logged into `{secondary_cluster}`, list the available StorageClasses:
 +
 [source,role="execute"]
 ----

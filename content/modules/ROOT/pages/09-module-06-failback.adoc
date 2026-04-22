@@ -81,7 +81,7 @@ Confirm the following:
 
 * The `oc patch` command completed without error
 * `openmrs-recoveryplan` is present and active in the `{infoscale_namespace}` namespace on `{secondary_cluster}`
-* The OpenMRS VM is running on `{primary_cluster}` (switch context and run `oc get vms -n openmrs` to confirm)
+* The OpenMRS VM is running on `{primary_cluster}` (run `oc get vms -n openmrs` on `{primary_cluster}` to confirm)
 
 == Learning outcomes
 

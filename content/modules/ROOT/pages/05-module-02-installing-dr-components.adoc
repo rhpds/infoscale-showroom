@@ -103,7 +103,6 @@ infoscale-dr-manager-<id>              1/1     Running   0          2m
 
 === Secondary cluster ({secondary_cluster})
 
-Switch your `oc` context to `{secondary_cluster}` and repeat the same steps.
 
 . Create the required PVC:
 +

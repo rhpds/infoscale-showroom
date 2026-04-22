@@ -3,6 +3,11 @@ include::partial$_attributes.adoc[]
 
 Welcome to this hands-on workshop! You will configure and validate a multi-site disaster recovery solution using InfoScale for Kubernetes {infoscale_version} and OpenShift Virtualization {ocpv_version}.
 
+[TIP]
+====
+This workshop requires working across two OpenShift clusters. Before starting, open *two terminal windows* -- one logged into `cluster-prod` (Primary Cluster) and one logged into `cluster-dr` (Secondary Cluster). Keep them open side by side throughout all modules. This eliminates confusion about which cluster each command should be executed on.
+====
+
 == What you'll learn
 
 In this workshop, you will:
@@ -19,15 +24,6 @@ In this workshop, you will:
 This workshop is designed for Platform Engineers, Storage Administrators, SREs, and OpenShift Virtualization Architects with intermediate experience who need to implement enterprise-grade disaster recovery for healthcare workloads.
 
 **Experience level**: Intermediate
-
-== Prerequisites
-
-Before starting this workshop, you should have:
-
-* Familiarity with OpenShift and the `oc` CLI
-* Basic understanding of Kubernetes custom resources (CRDs)
-* Understanding of storage concepts (PersistentVolumes, StorageClasses, replication)
-* Cluster-admin access to both `{primary_cluster}` and `{secondary_cluster}`
 
 == Workshop environment
 
