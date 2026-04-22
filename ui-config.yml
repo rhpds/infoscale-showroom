@@ -10,7 +10,7 @@ view_switcher:
   enabled: true
   default_mode: split
 
-tabs:
-  - name: Terminal
-    path: /wetty
-    port: 443
+# tabs:
+#   - name: Terminal
+#     path: /wetty
+#     port: 443
