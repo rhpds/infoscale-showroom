@@ -31,6 +31,7 @@ The `DataReplication` resource tells InfoScale to replicate the persistent data 
 +
 [source,yaml]
 ----
+oc apply -f - <<EOF
 apiVersion: infoscale.veritas.com/v1
 kind: DataReplication
 metadata:
@@ -58,6 +59,7 @@ spec:
   localHostAddress: 10.10.10.11           # A new floating IP will be enabled automatically
   localNIC: br-ex
   localNetMask: 255.255.0.0
+EOF
 ----
 +
 [source,role="execute"]
@@ -159,6 +161,7 @@ The `DisasterRecoveryPlan` defines which workload to protect, the preferred clus
 +
 [source,yaml]
 ----
+oc apply -f - <<EOF
 apiVersion: infoscale.veritas.com/v1
 kind: DisasterRecoveryPlan
 metadata:
@@ -174,6 +177,7 @@ spec:
   force: false
   primaryCluster: cluster-prod
   dataReplicationPointer: openmrs-datarep
+EOF
 ----
 +
 [source,role="execute"]

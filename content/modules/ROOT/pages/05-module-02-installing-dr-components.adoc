@@ -29,8 +29,9 @@ The InfoScale DR Manager requires a dedicated PersistentVolumeClaim for metadata
 
 . Create the required PVC by applying the pre-loaded manifest:
 +
-[source,yaml]
+[source,yaml,role="execute"]
 ----
+oc apply -f - <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -44,11 +45,7 @@ spec:
     requests:
       storage: 5Gi
   storageClassName: infoscale-rootdisk-sc
-----
-+
-[source,role="execute"]
-----
-oc apply -f infoscale-dr-meta-pvc.yaml
+EOF
 ----
 
 . Verify that the PVC was created and is in `Bound` state:
@@ -67,8 +64,9 @@ infoscale-dr-meta-bkp-pvc  Bound    <vol>    5Gi        RWX            infoscale
 
 . Install the InfoScale DR Manager Operator using the pre-loaded Subscription manifest:
 +
-[source,yaml]
+[source,yaml,role="execute"]
 ----
+oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -80,11 +78,7 @@ spec:
   source: certified-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
-----
-+
-[source,role="execute"]
-----
-oc apply -f infoscale-dr-operator.yaml
+EOF
 ----
 
 . Verify that the DR Manager pod is running:
@@ -106,9 +100,24 @@ infoscale-dr-manager-<id>              1/1     Running   0          2m
 
 . Create the required PVC:
 +
-[source,role="execute"]
+[source,yaml,role="execute"]
 ----
-oc apply -f infoscale-dr-meta-pvc.yaml
+oc apply -f - <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: infoscale-dr-meta-bkp-pvc
+  namespace: infoscale-vtas
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: infoscale-rootdisk-sc
+EOF
+----
 ----
 
 . Verify that the PVC is in `Bound` state:
@@ -127,9 +136,21 @@ infoscale-dr-meta-bkp-pvc  Bound    <vol>    5Gi        RWX            infoscale
 
 . Install the InfoScale DR Manager Operator:
 +
-[source,role="execute"]
+[source,yaml,role="execute"]
 ----
-oc apply -f infoscale-dr-operator.yaml
+oc apply -f - <<EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: infoscale-dr-manager
+  namespace: infoscale-vtas
+spec:
+  channel: fast
+  name: infoscale-dr-manager
+  source: certified-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic
+EOF
 ----
 
 . Verify that the DR Manager pod is running:
@@ -161,8 +182,9 @@ The DR Manager communicates between clusters using a NodePort service on port 14
 
 . Apply the NodePort Service manifest:
 +
-[source,yaml]
+[source,yaml,role="execute"]
 ----
+oc apply -f - <<EOF
 apiVersion: v1
 kind: Service
 metadata:
@@ -178,11 +200,7 @@ spec:
       protocol: TCP
   selector:
     control-plane: infoscale-dr-manager
-----
-+
-[source,role="execute"]
-----
-oc apply -f infoscale-dr-exposeport.yaml -n infoscale-vtas
+EOF
 ----
 
 . Retrieve the assigned NodePort and **note it down** -- you will need this value in Exercise C:
@@ -205,9 +223,25 @@ TIP: Record the NodePort shown in the `PORT(S)` column (e.g., `14155:30913/TCP` 
 
 . Apply the NodePort Service manifest:
 +
-[source,role="execute"]
+[source,yaml,role="execute"]
 ----
-oc apply -f infoscale-dr-exposeport.yaml -n infoscale-vtas
+oc apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: infoscale-dr-manager-nodeport
+  namespace: infoscale-vtas
+  labels:
+    control-plane: infoscale-dr-manager
+spec:
+  type: NodePort
+  ports:
+    - port: 14155
+      targetPort: 14155
+      protocol: TCP
+  selector:
+    control-plane: infoscale-dr-manager
+EOF
 ----
 
 . Retrieve the assigned NodePort and **note it down**:
@@ -236,7 +270,7 @@ WARNING: Before applying either manifest, open the file with `vi` and update the
 
 . Open the GCM manifest and update the `drControllerPort` values with the NodePorts recorded in Exercise B:
 +
-[source,role="execute"]
+[source,sh,role="execute"]
 ----
 vi infoscale-dr-gcm-clusterprod.yaml
 ----
