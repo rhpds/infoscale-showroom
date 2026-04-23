@@ -26,11 +26,11 @@ By the end of this module, you'll be able to:
 
 After the failover in Module 4, InfoScale automatically reversed the replication direction -- data changes made on `{secondary_cluster}` are now being replicated back to `{primary_cluster}`. Before initiating failback, confirm that this reverse replication is active and data is fully synchronized.
 
-. Describe the DataReplication resource to check the current replication status:
+. Describe the DataReplication resource to check the current replication status on cluster-DR:
 +
-[source,role="execute"]
+[source,console,role="execute-bottom"]
 ----
-oc describe datareplication -n infoscale-vtas
+oc describe datareplication -n infoscale-vtas | grep "Data Status\|Replication Status"
 ----
 +
 In the output, confirm the following fields before proceeding:
@@ -51,9 +51,9 @@ Confirm the following before continuing:
 
 With replication confirmed, initiate the failback by updating the `DisasterRecoveryPlan` to designate `{primary_cluster}` as the primary cluster again. InfoScale DR Manager will orchestrate the workload migration back to the original site.
 
-. Initiate the failback by patching the DisasterRecoveryPlan on `{secondary_cluster}`:
+. Initiate the failback by patching the DisasterRecoveryPlan on cluster-DR:
 +
-[source,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc patch disasterrecoveryplan openmrs-recoveryplan \
   -n infoscale-vtas \
@@ -63,7 +63,7 @@ oc patch disasterrecoveryplan openmrs-recoveryplan \
 
 . Verify the failback status:
 +
-[source,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get disasterrecoveryplan -n infoscale-vtas
 ----
@@ -95,5 +95,3 @@ By completing this module, you should now understand:
 == Module summary
 
 You have completed the failback scenario, returning the OpenMRS healthcare VM workload from `{secondary_cluster}` back to `{primary_cluster}`. This demonstrates the full lifecycle of disaster recovery with InfoScale for Kubernetes: initial replication configuration, failover to the DR site, and failback to the restored primary cluster -- all orchestrated through Kubernetes-native custom resources.
-
-xref:10-conclusion.adoc[Continue to Conclusion]
