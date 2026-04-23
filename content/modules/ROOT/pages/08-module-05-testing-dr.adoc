@@ -100,9 +100,9 @@ NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 svcopenmrs   ClusterIP   10.96.x.x       <none>        80/TCP    30s
 ----
 
-. Retrieve the Route URL and **note it down**:
+. Retrieve the Route URL:
 +
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get route openmrs -n openmrs
 ----
@@ -117,7 +117,7 @@ openmrs   openmrs-openmrs.<cluster-dr-ingress-domain>         svcopenmrs   80   
 . Execute the following to output a clickable link to the OpenMRS application:
 +
 .Top Terminal
-[source,console,role="execute-top"]
+[source,console,role="execute-bottom"]
 ----
 oc get route openmrs -n openmrs --no-headers | awk '{print "https://" $2}'
 ----
