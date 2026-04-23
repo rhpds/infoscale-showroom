@@ -91,12 +91,6 @@ oc get route openmrs -n openmrs --no-headers | awk '{print "https://" $2}'
 
 === Access the application and create a patient appointment
 
-. Open a browser and navigate to the application URL from the previous step:
-+
-----
-https://<route-host>
-----
-
 . Log in using the following demo credentials:
 +
 * **Username**: `admin`
