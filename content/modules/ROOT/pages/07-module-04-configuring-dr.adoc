@@ -27,9 +27,10 @@ By the end of this module, you'll be able to:
 
 The `DataReplication` resource tells InfoScale to replicate the persistent data in the `openmrs` namespace asynchronously from `{primary_cluster}` to `{secondary_cluster}`. This continuous non-periodic replication meets the OpenMRS Foundation's near-zero data loss requirement.
 
-. Apply the DataReplication manifest on `{primary_cluster}`:
+. Apply the DataReplication manifest on cluster-PROD:
 +
-[source,yaml,role="execute"]
+.Top Terminal
+[source,yaml,role="execute-top"]
 ----
 oc apply -f - <<EOF
 apiVersion: infoscale.veritas.com/v1
@@ -64,7 +65,7 @@ EOF
 
 . Verify that the DataReplication resource was created:
 +
-[source,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get datareplication -n infoscale-vtas
 ----
@@ -88,7 +89,7 @@ Initial synchronization copies the existing data in the `openmrs` namespace to `
 
 . Describe the DataReplication resource to check the current replication status:
 +
-[source,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc describe datareplication -n infoscale-vtas
 ----
@@ -152,9 +153,9 @@ Confirm the following before continuing:
 
 The `DisasterRecoveryPlan` defines which workload to protect, the preferred cluster priority, and the failover policy. Using `Manual` failover policy ensures no unintended switchovers occur without an explicit operator action.
 
-. Apply the DisasterRecoveryPlan manifest on `{primary_cluster}`:
+. Apply the DisasterRecoveryPlan manifest on cluster-PROD:
 +
-[source,yaml,role="execute"]
+[source,yaml,role="execute-top"]
 ----
 oc apply -f - <<EOF
 apiVersion: infoscale.veritas.com/v1
@@ -177,7 +178,7 @@ EOF
 
 . Verify that the DisasterRecoveryPlan was created:
 +
-[source,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get disasterrecoveryplan -n infoscale-vtas
 ----
@@ -202,9 +203,9 @@ Confirm the following before continuing:
 
 With replication active and the DR plan in place, you'll now trigger a migration of the `openmrs` workload to `{secondary_cluster}` by updating the `primaryCluster` field in the DisasterRecoveryPlan. This simulates the action an operator would take during a planned maintenance window or an actual DR event.
 
-. Initiate the migration by patching the DisasterRecoveryPlan to designate `{secondary_cluster}` as the new primary:
+. Initiate the migration by patching the DisasterRecoveryPlan to designate `{secondary_cluster}` as the new primary on cluster-PROD:
 +
-[source,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc patch disasterrecoveryplan openmrs-recoveryplan \
   -n infoscale-vtas \
@@ -245,5 +246,3 @@ By completing this module, you should now understand:
 == Module summary
 
 You have successfully configured disaster recovery for the OpenMRS healthcare VM application. The `openmrs-datarep` DataReplication resource is replicating the `openmrs` namespace asynchronously from `{primary_cluster}` to `{secondary_cluster}`. The `openmrs-recoveryplan` DisasterRecoveryPlan has been created with a manual failover policy, and the workload migration to `{secondary_cluster}` has been triggered. The environment is now ready for DR validation.
-
-xref:08-module-05-testing-dr.adoc[Continue to Module 5: Testing disaster recovery]
