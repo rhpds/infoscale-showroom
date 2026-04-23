@@ -20,6 +20,49 @@ By the end of this module, you'll be able to:
 * Interpret the `InfoScaleCluster` custom resource status to validate cluster readiness
 * Verify that the required InfoScale StorageClass is present and available for DR workloads
 
+== Exercise Z: Set up your user access to the two clusters
+
+There are two clusters in the environment, PROD and DR.
+You will use the top terminal for work on *cluster-PROD* and the bonus terminal for work on *cluster-DR*.
+
+. Verify top-terminal access to cluster-PROD
++
+[source,role="execute"]
+----
+oc whoami --show-server
+----
++
+Expected output:
++
+[source,sh,subs="attributes"]
+----
+https://api.cluster-{guid}.dynamic.redhatworkshops.io:6443
+----
+
+. Set up bottom-terminal access to cluster-DR
+
+Change to user `cloud-user` on cluster-DR and setup KUBECONFIG for access to *cluster-DR*:
++
+[source,role="execute"]
+----
+sudo -i
+su - cloud-user
+export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig
+echo "export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig" >> ~/.bash_profile
+tail -1 ~/.bash_profile
+oc whoami --show-server
+----
++
+Expected output:
++
+[source,sh,subs="attributes"]
+----
+export KUBECONFIG=/home/cloud-user/cluster-{guid}-dr/auth/kubeconfig
+https://api.cluster-{guid}-dr.dynamic.redhatworkshops.io:6443
+----
++
+NOTE: The URI of cluster-DR differs from cluster-PROD only in the hostname, with the `-dr` suffix.
+
 == Exercise A: Verify InfoScale installation on the primary cluster
 
 The OpenMRS Foundation's primary production workloads run on `{primary_cluster}`. Before configuring DR, confirm that InfoScale for Kubernetes {infoscale_version} is fully operational here.
