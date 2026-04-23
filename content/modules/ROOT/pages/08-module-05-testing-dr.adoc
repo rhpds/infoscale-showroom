@@ -27,9 +27,10 @@ By the end of this module, you'll be able to:
 
 After the migration triggered in Module 4, the `openmrs01` VirtualMachine should be running on `{secondary_cluster}`. Confirm this before attempting to expose or access the application.
 
-. Verify that the VirtualMachine is running on the DR site:
+. Verify that the VirtualMachine is running on cluster-DR:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute-bottom"]
 ----
 oc get vms -n openmrs
 ----
@@ -51,9 +52,9 @@ Confirm the following before continuing:
 
 The Service and Route created in Module 3 existed only on `{primary_cluster}`. You need to recreate them on `{secondary_cluster}` so the application is accessible at the DR site.
 
-. Apply the same service and route manifest used in Module 3:
+. Apply the same service and route manifest used in Module 3 on cluster-DR:
 +
-[source,yaml]
+[source,yaml,role="execute-bottom"]
 ----
 oc apply -f - <<EOF
 apiVersion: v1
@@ -87,7 +88,7 @@ EOF
 
 . Verify the Service was created:
 +
-[source,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get svc svcopenmrs -n openmrs
 ----
@@ -101,7 +102,7 @@ svcopenmrs   ClusterIP   10.96.x.x       <none>        80/TCP    30s
 
 . Retrieve the Route URL and **note it down**:
 +
-[source,role="execute"]
+[source,console,role="execute"]
 ----
 oc get route openmrs -n openmrs
 ----
@@ -113,7 +114,13 @@ NAME      HOST/PORT                                    PATH   SERVICES     PORT 
 openmrs   openmrs-openmrs.<cluster-dr-ingress-domain>         svcopenmrs   80     edge          None
 ----
 +
-TIP: Copy the full `HOST/PORT` value and prefix it with `https://` to access the application. Note that this URL will differ from the one used in Module 3 since it resolves to `{secondary_cluster}`.
+. Execute the following to output a clickable link to the OpenMRS application:
++
+.Top Terminal
+[source,console,role="execute-top"]
+----
+oc get route openmrs -n openmrs --no-headers | awk '{print "https://" $2}'
+----
 
 === Verify
 
@@ -127,12 +134,6 @@ Confirm the following before continuing:
 With the application accessible on the DR site, you'll now confirm that the patient appointment record created in Module 3 is present and intact. A successful validation proves that InfoScale's asynchronous replication delivered near-zero data loss through continuous non-periodic replication during the failover.
 
 === Access the application
-
-. Open a browser and navigate to the Route URL obtained in Exercise B:
-+
-----
-https://<route-host-on-cluster-dr>
-----
 
 . Log in using the same demo credentials as in Module 3:
 +
@@ -183,5 +184,3 @@ By completing this module, you should now understand:
 Congratulations! You have successfully completed an end-to-end disaster recovery test for OpenShift Virtualization using InfoScale for Kubernetes. The healthcare VM `openmrs01` is now running on `{secondary_cluster}`, and the patient appointment record for James Martinez created in Module 3 is fully intact -- confirming near-zero data loss through continuous non-periodic replication and a successful DR failover.
 
 This validates the OpenMRS Foundation's DR architecture and demonstrates that InfoScale asynchronous replication effectively protects stateful virtual machine workloads on OpenShift Virtualization {ocpv_version}.
-
-xref:09-module-06-failback.adoc[Continue to Module 6: Failback to primary cluster (optional)]
