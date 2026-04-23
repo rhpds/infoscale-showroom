@@ -28,7 +28,7 @@ You will use the top terminal for work on *cluster-PROD* and the bonus terminal 
 . Verify top-terminal access to cluster-PROD
 +
 .Top Terminal
-[source,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc whoami --show-server
 ----
@@ -45,7 +45,7 @@ https://api.cluster-{guid}.dynamic.redhatworkshops.io:6443
 .. Change to user `cloud-user`
 +
 .Bottom Terminal
-[source,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 sudo -u cloud-user -i
 ----
@@ -53,7 +53,7 @@ sudo -u cloud-user -i
 .. Set up KUBECONFIG for cloud-user to access cluster-DR
 +
 .Bottom Terminal
-[source,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig
 echo "export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig" >> ~/.bash_profile
@@ -76,7 +76,7 @@ The OpenMRS Foundation's primary production workloads run on `{primary_cluster}`
 . Verify that the InfoScale pods are running:
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -98,7 +98,7 @@ patch-infoscale-storageprofile-7mkdd            0/1     Completed   0           
 . Check the PROD InfoScale Cluster status:
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get infoscalecluster -n infoscale-vtas
 ----
@@ -117,7 +117,7 @@ The secondary DR cluster (`{secondary_cluster}`) must also have a healthy InfoSc
 . Verify that the DR InfoScale pods are running:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -139,7 +139,7 @@ patch-infoscale-storageprofile-4zphb            0/1     Completed   0           
 . Check the DR InfoScale Cluster status:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get infoscalecluster -n infoscale-vtas
 ----
@@ -160,7 +160,7 @@ The `{infoscale_storageclass}` StorageClass is required to provision volumes for
 . List the available PROD StorageClasses:
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get storageclass
 ----
@@ -172,7 +172,7 @@ Confirm that `{infoscale_storageclass}` appears in the output. The provisioner c
 . In the terminal logged into `{secondary_cluster}`, list the available DR StorageClasses:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get storageclass
 ----

@@ -30,7 +30,7 @@ The InfoScale DR Manager requires a dedicated PersistentVolumeClaim for metadata
 . Create the required PVC by applying the pre-loaded manifest on cluster-PROD:
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc apply -f - <<EOF
 apiVersion: v1
@@ -52,7 +52,7 @@ EOF
 . Verify that the PVC was created and is in `Bound` state:
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get pvc -n infoscale-vtas
 ----
@@ -67,7 +67,7 @@ infoscale-dr-meta-bkp-pvc  Bound    <vol>    5Gi        RWX            infoscale
 . Install the InfoScale DR Manager Operator using the pre-loaded Subscription manifest on cluster-PROD:
 +
 .Top Terminal
-[source,yaml,role="execute"]
+[source,yaml,role="execute-top"]
 ----
 oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
@@ -86,7 +86,7 @@ EOF
 
 . Verify that the DR Manager pod is running on cluster-PROD
 +
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -103,7 +103,7 @@ infoscale-dr-manager-<id>              1/1     Running   0          2m
 . Create the required PVC on cluster-DR:
 +
 .Bottom Terminal
-[source,yaml,role="execute"]
+[source,yaml,role="execute-bottom"]
 ----
 oc apply -f - <<EOF
 apiVersion: v1
@@ -125,7 +125,7 @@ EOF
 . Verify that the PVC is in `Bound` state:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get pvc -n infoscale-vtas
 ----
@@ -140,7 +140,7 @@ infoscale-dr-meta-bkp-pvc  Bound    <vol>    5Gi        RWX            infoscale
 . Install the InfoScale DR Manager Operator on cluster-DR:
 +
 .Bottom Terminal
-[source,yaml,role="execute"]
+[source,yaml,role="execute-bottom"]
 ----
 oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
@@ -159,7 +159,7 @@ EOF
 
 . Verify that the DR Manager pod is running on cluster-DR:
 +
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -187,7 +187,7 @@ The DR Manager communicates between clusters using a NodePort service on port 14
 . Apply the NodePort Service manifest on cluster-PROD:
 +
 .Top Terminal
-[source,yaml,role="execute"]
+[source,yaml,role="execute-top"]
 ----
 oc apply -f - <<EOF
 apiVersion: v1
@@ -211,7 +211,7 @@ EOF
 . Retrieve the assigned NodePort and **note it down** -- you will need this value in Exercise C:
 +
 .Top Terminal
-[source,role="execute"]
+[source,role="execute-top"]
 ----
 oc get svc infoscale-dr-manager-nodeport -n infoscale-vtas
 ----
@@ -230,7 +230,7 @@ TIP: Record the NodePort shown in the `PORT(S)` column (e.g., `14155:30913/TCP` 
 . Apply the NodePort Service manifest on cluster-DR:
 +
 .Bottom Terminal
-[source,yaml,role="execute"]
+[source,yaml,role="execute-bottom"]
 ----
 oc apply -f - <<EOF
 apiVersion: v1
@@ -254,7 +254,7 @@ EOF
 . Retrieve the assigned NodePort and **note it down**:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get svc infoscale-dr-manager-nodeport -n infoscale-vtas
 ----
@@ -279,7 +279,7 @@ WARNING: Before applying either manifest, open the file with `vi` and update the
 . Open the GCM manifest and update the `drControllerPort` values with the NodePorts recorded in Exercise B on cluster-PROD:
 +
 .Top Terminal
-[source,sh,role="execute"]
+[source,sh,role="execute-top"]
 ----
 vi infoscale-dr-gcm-clusterprod.yaml
 ----
@@ -313,7 +313,7 @@ spec:
 ----
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc apply -f infoscale-dr-gcm-clusterprod.yaml -n infoscale-vtas
 ----
@@ -321,7 +321,7 @@ oc apply -f infoscale-dr-gcm-clusterprod.yaml -n infoscale-vtas
 . Verify the GlobalClusterMembership status:
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get globalclustermembership -n infoscale-vtas
 ----
@@ -338,7 +338,7 @@ global-cluster-membership   cluster-prod                              {"cluster-
 . Open the GCM manifest and update the `drControllerPort` values for cluster-DR:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 vi infoscale-dr-gcm-clustertarget.yaml
 ----
@@ -372,7 +372,7 @@ spec:
 ----
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc apply -f infoscale-dr-gcm-clustertarget.yaml -n infoscale-vtas
 ----
@@ -380,7 +380,7 @@ oc apply -f infoscale-dr-gcm-clustertarget.yaml -n infoscale-vtas
 . Verify the GlobalClusterMembership status:
 +
 .Bottom Terminal
-[source,console,role="execute"]
+[source,console,role="execute-bottom"]
 ----
 oc get globalclustermembership -n infoscale-vtas
 ----
@@ -397,7 +397,7 @@ Confirm the following before continuing:
 . Verify that the GlobalClusterMembership status shows `CONNECTED` for both `{primary_cluster}` and `{secondary_cluster}`
 +
 .Top Terminal
-[source,console,role="execute"]
+[source,console,role="execute-top"]
 ----
 oc get globalclustermembership -n infoscale-vtas
 ----
