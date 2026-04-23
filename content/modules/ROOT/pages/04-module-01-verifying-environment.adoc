@@ -41,15 +41,19 @@ https://api.cluster-{guid}.dynamic.redhatworkshops.io:6443
 
 . Set up bottom-terminal access to cluster-DR
 
-Change to user `cloud-user` on cluster-DR and setup KUBECONFIG for access to *cluster-DR*:
+.. Change to user `cloud-user`
 +
 [source,role="execute"]
 ----
-sudo -i
-su - cloud-user
+sudo -u cloud-user -i
+----
++
+.. Set up KUBECONFIG for cloud-user to access cluster-DR
++
+[source,role="execute"]
+----
 export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig
 echo "export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig" >> ~/.bash_profile
-tail -1 ~/.bash_profile
 oc whoami --show-server
 ----
 +
@@ -57,7 +61,6 @@ Expected output:
 +
 [source,sh,subs="attributes"]
 ----
-export KUBECONFIG=/home/cloud-user/cluster-{guid}-dr/auth/kubeconfig
 https://api.cluster-{guid}-dr.dynamic.redhatworkshops.io:6443
 ----
 +
