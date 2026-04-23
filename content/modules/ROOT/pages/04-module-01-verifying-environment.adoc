@@ -27,6 +27,7 @@ You will use the top terminal for work on *cluster-PROD* and the bonus terminal 
 
 . Verify top-terminal access to cluster-PROD
 +
+.Top Terminal
 [source,role="execute"]
 ----
 oc whoami --show-server
@@ -42,7 +43,9 @@ https://api.cluster-{guid}.dynamic.redhatworkshops.io:6443
 . Set up bottom-terminal access to cluster-DR
 
 .. Change to user `cloud-user`
+
 +
+.Bottom Terminal
 [source,role="execute"]
 ----
 sudo -u cloud-user -i
@@ -50,6 +53,7 @@ sudo -u cloud-user -i
 +
 .. Set up KUBECONFIG for cloud-user to access cluster-DR
 +
+.Bottom Terminal
 [source,role="execute"]
 ----
 export KUBECONFIG=/home/cloud-user/cluster-$GUID-dr/auth/kubeconfig
@@ -72,7 +76,8 @@ The OpenMRS Foundation's primary production workloads run on `{primary_cluster}`
 
 . Verify that the InfoScale pods are running:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -80,16 +85,21 @@ oc get pods -n infoscale-vtas
 Expected output:
 +
 ----
-NAME                                      READY   STATUS    RESTARTS   AGE
-infoscale-operator-<id>                   1/1     Running   0          2d
-infoscale-csi-controller-<id>             2/2     Running   0          2d
-infoscale-csi-node-<id>                   3/3     Running   0          2d
+NAME                                            READY   STATUS      RESTARTS       AGE
+infoscale-csi-controller-c68c8f9b9-6tcvk        5/5     Running     1 (162m ago)   163m
+infoscale-csi-node-vntjx                        2/2     Running     0              163m
+infoscale-fencing-controller-cf95f5b9f-qrnnl    1/1     Running     0              163m
+infoscale-fencing-enabler-5l9j2                 1/1     Running     0              163m
+infoscale-licensing-operator-7bf58c89cd-c7fbv   1/1     Running     0              165m
+infoscale-sds-23059-b9e0f585e30db148-w4vwm      1/1     Running     0              163m
+infoscale-sds-operator-648848f6d7-rgrqd         1/1     Running     0              165m
+patch-infoscale-storageprofile-7mkdd            0/1     Completed   0              142m
 ----
-+
 
-. Check the InfoScale Cluster status:
+. Check the PROD InfoScale Cluster status:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc get infoscalecluster -n infoscale-vtas
 ----
@@ -97,18 +107,18 @@ oc get infoscalecluster -n infoscale-vtas
 Expected output:
 +
 ----
-NAME              STATUS   AGE
-infoscalecluster  Ready    2d
+NAME           VERSION   CLUSTERID   STATE     DISKGROUPS           STATUS    AGE
+cluster-prod   9.1.2     23059       Running   vrts_kube_dg-23059   Healthy   172m
 ----
 
 == Exercise B: Verify InfoScale installation on the secondary cluster
 
 The secondary DR cluster (`{secondary_cluster}`) must also have a healthy InfoScale installation. Failover cannot succeed if the destination cluster has infrastructure issues.
 
-
-. Verify that the InfoScale pods are running:
+. Verify that the DR InfoScale pods are running:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -116,16 +126,21 @@ oc get pods -n infoscale-vtas
 Expected output:
 +
 ----
-NAME                                      READY   STATUS    RESTARTS   AGE
-infoscale-operator-<id>                   1/1     Running   0          2d
-infoscale-csi-controller-<id>             2/2     Running   0          2d
-infoscale-csi-node-<id>                   3/3     Running   0          2d
+NAME                                            READY   STATUS      RESTARTS       AGE
+infoscale-csi-controller-c68c8f9b9-hsdrr        5/5     Running     1 (168m ago)   169m
+infoscale-csi-node-mbwv5                        2/2     Running     0              169m
+infoscale-fencing-controller-cf95f5b9f-6x5kb    1/1     Running     0              169m
+infoscale-fencing-enabler-xtp2x                 1/1     Running     0              169m
+infoscale-licensing-operator-547cf5fbc8-8qbsm   1/1     Running     0              174m
+infoscale-sds-35613-b9e0f585e30db148-p9jhz      1/1     Running     0              169m
+infoscale-sds-operator-ddb5bd6fd-ckslq          1/1     Running     0              174m
+patch-infoscale-storageprofile-4zphb            0/1     Completed   0              148m
 ----
-+
 
-. Check the InfoScale Cluster status:
+. Check the DR InfoScale Cluster status:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc get infoscalecluster -n infoscale-vtas
 ----
@@ -133,20 +148,20 @@ oc get infoscalecluster -n infoscale-vtas
 Expected output:
 +
 ----
-NAME              STATUS   AGE
-infoscalecluster  Ready    2d
+NAME           VERSION   CLUSTERID   STATE     DISKGROUPS           STATUS    AGE
+cluster-prod   9.1.2     35613       Running   vrts_kube_dg-35613   Healthy   171m
 ----
 
 == Exercise C: Verify storage configuration
 
 The `{infoscale_storageclass}` StorageClass is required to provision volumes for the OpenMRS healthcare VM workloads. It must be present and available on **both clusters** before you configure data replication in Module 4.
 
-
 === Primary cluster ({primary_cluster})
 
-. List the available StorageClasses:
+. List the available PROD StorageClasses:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc get storageclass
 ----
@@ -155,14 +170,15 @@ Confirm that `{infoscale_storageclass}` appears in the output. The provisioner c
 
 === Secondary cluster ({secondary_cluster})
 
-. In the terminal logged into `{secondary_cluster}`, list the available StorageClasses:
+. In the terminal logged into `{secondary_cluster}`, list the available DR StorageClasses:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc get storageclass
 ----
 +
-Confirm that `{infoscale_storageclass}` is also present on the secondary cluster.
+Confirm that `{infoscale_storageclass}` is also present on the DR cluster.
 
 == Learning outcomes
 
