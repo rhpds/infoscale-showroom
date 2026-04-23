@@ -26,9 +26,10 @@ By the end of this module, you'll be able to:
 
 Before exposing the application, confirm that the OpenMRS VirtualMachine (`openmrs01`) is running on `{primary_cluster}`.
 
-. Check the VirtualMachine status in the `openmrs` namespace:
+. Check the VirtualMachine status in the `openmrs` namespace on cluster-PROD:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute-top"]
 ----
 oc get vms -n openmrs
 ----
