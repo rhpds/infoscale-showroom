@@ -27,9 +27,10 @@ The InfoScale DR Manager requires a dedicated PersistentVolumeClaim for metadata
 
 === Primary cluster ({primary_cluster})
 
-. Create the required PVC by applying the pre-loaded manifest:
+. Create the required PVC by applying the pre-loaded manifest on cluster-PROD:
 +
-[source,yaml,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc apply -f - <<EOF
 apiVersion: v1
@@ -50,7 +51,8 @@ EOF
 
 . Verify that the PVC was created and is in `Bound` state:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc get pvc -n infoscale-vtas
 ----
@@ -62,8 +64,9 @@ NAME                        STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGEC
 infoscale-dr-meta-bkp-pvc  Bound    <vol>    5Gi        RWX            infoscale-rootdisk-sc   30s
 ----
 
-. Install the InfoScale DR Manager Operator using the pre-loaded Subscription manifest:
+. Install the InfoScale DR Manager Operator using the pre-loaded Subscription manifest on cluster-PROD:
 +
+.Top Terminal
 [source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
@@ -81,9 +84,9 @@ spec:
 EOF
 ----
 
-. Verify that the DR Manager pod is running:
+. Verify that the DR Manager pod is running on cluster-PROD
 +
-[source,role="execute"]
+[source,console,role="execute"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -97,9 +100,9 @@ infoscale-dr-manager-<id>              1/1     Running   0          2m
 
 === Secondary cluster ({secondary_cluster})
 
-
-. Create the required PVC:
+. Create the required PVC on cluster-DR:
 +
+.Bottom Terminal
 [source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
@@ -118,11 +121,11 @@ spec:
   storageClassName: infoscale-rootdisk-sc
 EOF
 ----
-----
 
 . Verify that the PVC is in `Bound` state:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc get pvc -n infoscale-vtas
 ----
@@ -134,8 +137,9 @@ NAME                        STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGEC
 infoscale-dr-meta-bkp-pvc  Bound    <vol>    5Gi        RWX            infoscale-rootdisk-sc   30s
 ----
 
-. Install the InfoScale DR Manager Operator:
+. Install the InfoScale DR Manager Operator on cluster-DR:
 +
+.Bottom Terminal
 [source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
@@ -153,9 +157,9 @@ spec:
 EOF
 ----
 
-. Verify that the DR Manager pod is running:
+. Verify that the DR Manager pod is running on cluster-DR:
 +
-[source,role="execute"]
+[source,console,role="execute"]
 ----
 oc get pods -n infoscale-vtas
 ----
@@ -180,8 +184,9 @@ The DR Manager communicates between clusters using a NodePort service on port 14
 
 === Primary cluster ({primary_cluster})
 
-. Apply the NodePort Service manifest:
+. Apply the NodePort Service manifest on cluster-PROD:
 +
+.Top Terminal
 [source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
@@ -205,6 +210,7 @@ EOF
 
 . Retrieve the assigned NodePort and **note it down** -- you will need this value in Exercise C:
 +
+.Top Terminal
 [source,role="execute"]
 ----
 oc get svc infoscale-dr-manager-nodeport -n infoscale-vtas
@@ -221,8 +227,9 @@ TIP: Record the NodePort shown in the `PORT(S)` column (e.g., `14155:30913/TCP` 
 
 === Secondary cluster ({secondary_cluster})
 
-. Apply the NodePort Service manifest:
+. Apply the NodePort Service manifest on cluster-DR:
 +
+.Bottom Terminal
 [source,yaml,role="execute"]
 ----
 oc apply -f - <<EOF
@@ -246,7 +253,8 @@ EOF
 
 . Retrieve the assigned NodePort and **note it down**:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc get svc infoscale-dr-manager-nodeport -n infoscale-vtas
 ----
@@ -268,8 +276,9 @@ WARNING: Before applying either manifest, open the file with `vi` and update the
 
 === Primary cluster ({primary_cluster})
 
-. Open the GCM manifest and update the `drControllerPort` values with the NodePorts recorded in Exercise B:
+. Open the GCM manifest and update the `drControllerPort` values with the NodePorts recorded in Exercise B on cluster-PROD:
 +
+.Top Terminal
 [source,sh,role="execute"]
 ----
 vi infoscale-dr-gcm-clusterprod.yaml
@@ -279,6 +288,7 @@ Update `drControllerPort` for `{primary_cluster}` with the **Primary Cluster Nod
 
 . Apply the updated manifest on `{primary_cluster}`:
 +
+.Top Terminal
 [source,yaml]
 ----
 apiVersion: infoscale.veritas.com/v1
@@ -302,14 +312,16 @@ spec:
   metadataBackupInterval: 15
 ----
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc apply -f infoscale-dr-gcm-clusterprod.yaml -n infoscale-vtas
 ----
 
 . Verify the GlobalClusterMembership status:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute"]
 ----
 oc get globalclustermembership -n infoscale-vtas
 ----
@@ -317,15 +329,16 @@ oc get globalclustermembership -n infoscale-vtas
 Expected output:
 +
 ----
-NAME                       STATUS
-global-cluster-membership  <initializing>
+NAME                        CLUSTER NAME   CLUSTER STATE   PROTOCOL   PEER LINK STATE
+global-cluster-membership   cluster-prod                              {"cluster-dr":"UNKNOWN","cluster-prod":"UNKNOWN"}
 ----
 
 === Secondary cluster ({secondary_cluster})
 
-. Open the GCM manifest and update the `drControllerPort` values:
+. Open the GCM manifest and update the `drControllerPort` values for cluster-DR:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 vi infoscale-dr-gcm-clustertarget.yaml
 ----
@@ -334,6 +347,7 @@ Update `drControllerPort` for `{secondary_cluster}` with the **Secondary Cluster
 
 . Apply the updated manifest on `{secondary_cluster}`:
 +
+.Bottom Terminal
 [source,yaml]
 ----
 apiVersion: infoscale.veritas.com/v1
@@ -357,14 +371,16 @@ spec:
   metadataBackupInterval: 15
 ----
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc apply -f infoscale-dr-gcm-clustertarget.yaml -n infoscale-vtas
 ----
 
 . Verify the GlobalClusterMembership status:
 +
-[source,role="execute"]
+.Bottom Terminal
+[source,console,role="execute"]
 ----
 oc get globalclustermembership -n infoscale-vtas
 ----
@@ -378,6 +394,21 @@ Confirm the following before continuing:
 * `GlobalClusterMembership` resource is present on both clusters
 * Peer Link State shows `CONNECTED` for both `{primary_cluster}` and `{secondary_cluster}`
 
+. Verify that the GlobalClusterMembership status shows `CONNECTED` for both `{primary_cluster}` and `{secondary_cluster}`
++
+.Top Terminal
+[source,console,role="execute"]
+----
+oc get globalclustermembership -n infoscale-vtas
+----
++
+Expected output:
++
+----
+NAME                        CLUSTER NAME   CLUSTER STATE   PROTOCOL   PEER LINK STATE
+global-cluster-membership   cluster-prod   RUNNING         10         {"cluster-dr":"CONNECTED","cluster-prod":"CONNECTED"}
+----
+
 == Learning outcomes
 
 By completing this module, you should now understand:
@@ -390,5 +421,3 @@ By completing this module, you should now understand:
 == Module summary
 
 You have successfully installed the InfoScale DR Manager on both clusters and established the Global Cluster Membership. Both `{primary_cluster}` and `{secondary_cluster}` are now connected and communicating through their respective NodePort services. The DR control plane is ready for replication configuration.
-
-xref:06-module-03-validating-healthcare-vm.adoc[Continue to Module 3: Validating the Healthcare VM Application]
