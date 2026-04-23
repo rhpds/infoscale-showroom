@@ -53,7 +53,8 @@ To validate data consistency after the DR failover in Module 5, you need a known
 
 . Verify the Service was created:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute-top"]
 ----
 oc get svc svcopenmrs -n openmrs
 ----
@@ -67,7 +68,8 @@ svcopenmrs   ClusterIP   10.96.x.x       <none>        80/TCP    30s
 
 . Retrieve the Route URL and **note it down** -- you will need this to access the application and again after the DR failover in Module 5:
 +
-[source,role="execute"]
+.Top Terminal
+[source,console,role="execute-top"]
 ----
 oc get route openmrs -n openmrs
 ----
@@ -79,7 +81,13 @@ NAME      HOST/PORT                                   PATH   SERVICES     PORT  
 openmrs   openmrs-openmrs.<cluster-ingress-domain>          svcopenmrs   80     edge          None
 ----
 +
-TIP: Copy the full `HOST/PORT` value -- this is your application URL. Prefix it with `https://` to open it in the browser.
+. Execute the following to output a clickable link to the OpenMRS application:
++
+.Top Terminal
+[source,console,role="execute-top"]
+----
+oc get route openmrs -n openmrs --no-headers | awk '{print "https://" $2}'
+----
 
 === Access the application and create a patient appointment
 
@@ -130,5 +138,3 @@ By completing this module, you should now understand:
 == Module summary
 
 You have verified that the OpenMRS VirtualMachine `openmrs01` is running on `{primary_cluster}` and exposed it via an OpenShift Route. A patient appointment record for James Martinez has been created in persistent storage. This record will serve as the data consistency validation reference after the DR failover in Module 5.
-
-xref:07-module-04-configuring-dr.adoc[Continue to Module 4: Configuring disaster recovery]
