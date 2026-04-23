@@ -51,8 +51,11 @@ Confirm the following before continuing:
 
 With replication confirmed, initiate the failback by updating the `DisasterRecoveryPlan` to designate `{primary_cluster}` as the primary cluster again. InfoScale DR Manager will orchestrate the workload migration back to the original site.
 
-. Initiate the failback by patching the DisasterRecoveryPlan on cluster-DR:
+. Initiate the failback by patching the DisasterRecoveryPlan on cluster-PROD:
 +
+NOTE: Migration can be performed from the cluster-DR only.
++
+.Bottom Terminal
 [source,console,role="execute-bottom"]
 ----
 oc patch disasterrecoveryplan openmrs-recoveryplan \
@@ -73,6 +76,13 @@ Expected output:
 ----
 NAME                  AGE
 openmrs-recoveryplan  <age>
+----
+
+. Verify the OpenMRS VM is running on the primary cluster, cluster-PROD:
++
+[source,console,role="execute-top"]
+----
+oc get vms -n openmrs
 ----
 
 === Verify
