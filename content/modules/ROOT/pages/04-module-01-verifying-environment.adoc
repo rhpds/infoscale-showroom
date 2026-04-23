@@ -43,14 +43,13 @@ https://api.cluster-{guid}.dynamic.redhatworkshops.io:6443
 . Set up bottom-terminal access to cluster-DR
 
 .. Change to user `cloud-user`
-
 +
 .Bottom Terminal
 [source,role="execute"]
 ----
 sudo -u cloud-user -i
 ----
-+
+
 .. Set up KUBECONFIG for cloud-user to access cluster-DR
 +
 .Bottom Terminal
@@ -192,5 +191,3 @@ By completing this module, you should now understand:
 == Module summary
 
 You have verified the lab environment. Both clusters are running InfoScale for Kubernetes {infoscale_version} with all pods in a healthy state, and the `{infoscale_storageclass}` StorageClass is available on both `{primary_cluster}` and `{secondary_cluster}`. The environment is ready for the next phase.
-
-xref:05-module-02-installing-dr-components.adoc[Continue to Module 2: Installing DR components]
