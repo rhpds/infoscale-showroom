@@ -12,8 +12,11 @@ view_switcher:
   default_mode: split
 
 tabs:
-  - name: Terminal
-    path: /terminal
+  - name: cluster-PROD
+    path: /wetty
     port: 443
+    secondary_name: cluster-DR
+    secondary_path: /wetty
+    secondary_port: 443
   - name: OCP Console
     url: 'https://console-openshift-console.${DOMAIN}'
