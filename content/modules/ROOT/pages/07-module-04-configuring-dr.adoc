@@ -73,8 +73,8 @@ oc get datareplication -n infoscale-vtas
 Expected output:
 +
 ----
-NAME              AGE
-openmrs-datarep   30s
+NAME              PROPOSED PRIMARY   CURRENT PRIMARY   APP NAMESPACE   LABELS
+openmrs-datarep   cluster-prod                         openmrs
 ----
 
 === Verify
@@ -95,8 +95,9 @@ oc describe datareplication -n infoscale-vtas
 ----
 +
 Look for the `Data Status` field in the output. Wait until it shows `consistent, up-to-date` before proceeding.
-
-.Expected output
++
+Expected output
++
 [source,text]
 ----
 Name:         openmrs-datarep
@@ -139,8 +140,18 @@ Status:
       Secondary Host:              10.10.20.11
       State:                       behind by 0m 0s
 ----
++
 
-IMPORTANT: Initial replication synchronization may take approximately **5 to 10 minutes** to complete. Wait until `Data Status` shows `consistent, up-to-date` before proceeding to Exercise C.
+. Wait for replication to complete and check the `Data Status` field again:
++
+[source,console,role="execute-top"]
+----
+oc describe datareplication -n infoscale-vtas | grep Data\ Status
+----
+
+WARNING: *WAIT FIVE MINUTES*
+
+NOTE: Initial replication synchronization may take approximately **5 to 10 minutes** to complete. Wait until `Data Status` shows `consistent, up-to-date` before proceeding to Exercise C.
 
 === Verify
 
