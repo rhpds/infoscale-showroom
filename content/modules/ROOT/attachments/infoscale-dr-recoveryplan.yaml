@@ -1,0 +1,16 @@
+apiVersion: infoscale.veritas.com/v1
+kind: DisasterRecoveryPlan
+metadata:
+  name: openmrs-recoveryplan
+  namespace: infoscale-vtas
+spec:
+  preferredClusterList:
+    - cluster-prod
+    - cluster-dr
+  selector:
+    namespace: openmrs
+  clusterFailOverPolicy: Manual
+  force: false
+  primaryCluster: cluster-prod
+  dataReplicationPointer: openmrs-datarep
+

@@ -1,0 +1,19 @@
+apiVersion: infoscale.veritas.com/v1
+kind: GlobalClusterMembership
+metadata:
+  name: global-cluster-membership
+spec:
+  globalMemberClusters:
+    - clusterID: cluster-prod
+      drControllerAddress: 192.168.0.10
+      drControllerPort: '30913'
+    - clusterID: cluster-dr
+      drControllerAddress: 192.168.20.51
+      drControllerPort: '30863'
+  backupClusterScopeCRD: true
+  counterMissTolerance: 5
+  datarepRefreshStatusFrequency: 5
+  globalClusterOperation: none
+  localClusterName: cluster-prod
+  maximumMetadataCopies: 5
+  metadataBackupInterval: 15

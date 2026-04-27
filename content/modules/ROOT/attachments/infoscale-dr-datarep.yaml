@@ -1,0 +1,27 @@
+apiVersion: infoscale.veritas.com/v1
+kind: DataReplication
+metadata:
+  name: openmrs-datarep
+  namespace: infoscale-vtas
+spec:
+  lbEnabled: false
+  remoteClusterDetails:
+    - remoteLbEnabled: false
+      remoteCloudVendor: Local
+      clusterName: cluster-dr
+      latencyProtection: disable
+      logProtection: autodcm
+      networkTransportProtocol: TCP
+      remoteHostAddress: 192.168.20.200
+      remoteNIC: br-ex
+      remoteNetMask: 255.255.255.0
+      replicationState: start
+      replicationType: async
+  cloudVendor: Local
+  selector:
+    namespace: openmrs
+  currentPrimary: cluster-prod
+  force: false
+  localHostAddress: 192.168.20.201
+  localNIC: ens256
+  localNetMask: 255.255.255.0

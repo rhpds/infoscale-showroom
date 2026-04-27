@@ -1,0 +1,12 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: infoscale-dr-manager
+  namespace: infoscale-vtas
+spec:
+  channel: fast
+  name: infoscale-dr-manager
+  source: certified-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic

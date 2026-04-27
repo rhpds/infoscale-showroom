@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: infoscale-dr-manager-nodeport
+  namespace: infoscale-vtas
+  labels:
+    control-plane: infoscale-dr-manager
+spec:
+  type: NodePort
+  ports:
+    - port: 14155
+      targetPort: 14155
+      protocol: TCP
+  selector:
+    control-plane: infoscale-dr-manager
