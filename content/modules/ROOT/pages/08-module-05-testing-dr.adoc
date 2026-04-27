@@ -50,7 +50,19 @@ Confirm the following before continuing:
 
 == Exercise B: Expose the VM service on the secondary cluster
 
-The Service and Route created in Module 3 existed only on `{primary_cluster}`. You need to recreate them on `{secondary_cluster}` so the application is accessible at the DR site.
+The Service and Route created in Module 3 existed only on `{primary_cluster}`.
+You need to recreate them on `{secondary_cluster}` so the application is accessible at the DR site.
+
+However, the Route has been migrated over to the secondary cluster.
+It must be deleted so a new more appropriate one can be created.
+This is because these servers are being addressed by each of their custom hostnames, without more advanced IP-failover or load-balancing in front of them to normalize their domain names.
+
+. Delete the `openmrs` Route:
++
+[source,console,role="execute-bottom"]
+----
+oc delete route openmrs -n openmrs
+----
 
 . Apply the same service and route manifest used in Module 3 on cluster-DR:
 +
