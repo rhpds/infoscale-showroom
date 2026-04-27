@@ -93,6 +93,56 @@ Confirm the following:
 * `openmrs-recoveryplan` is present and active in the `{infoscale_namespace}` namespace on `{secondary_cluster}`
 * The OpenMRS VM is running on `{primary_cluster}` (run `oc get vms -n openmrs` on `{primary_cluster}` to confirm)
 
+== Expose the VM service on the primary cluster
+
+The Service and Route created in Module 5 existed only on `{secondary_cluster}`.
+You need to recreate them on `{primary_cluster}` so the application is accessible at the PROD site.
+
+However, the Route has been migrated over to the primary cluster.
+It must be deleted so a new more appropriate one can be created.
+This is because these servers are being addressed by each of their custom hostnames, without more advanced IP-failover or load-balancing in front of them to normalize their domain names.
+
+. Delete the `openmrs` Route:
++
+[source,console,role="execute-top"]
+----
+oc delete route openmrs -n openmrs
+----
+
+. Apply the same service and route manifest cluster-PROD:
++
+[source,yaml,role="execute-top"]
+----
+oc apply -f - <<EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: svcopenmrs
+  namespace: openmrs
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    kubevirt.io/domain: openmrs01
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openmrs
+  namespace: openmrs
+spec:
+  to:
+    kind: Service
+    name: svcopenmrs
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
+EOF
+----
+
 == Learning outcomes
 
 By completing this module, you should now understand:
