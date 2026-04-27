@@ -5,10 +5,10 @@ metadata:
 spec:
   globalMemberClusters:
     - clusterID: cluster-prod
-      drControllerAddress: 192.168.0.10
+      drControllerAddress: 10.10.10.10
       drControllerPort: '30913'
     - clusterID: cluster-dr
-      drControllerAddress: 192.168.20.51
+      drControllerAddress: 10.10.20.10
       drControllerPort: '30863'
   backupClusterScopeCRD: true
   counterMissTolerance: 5

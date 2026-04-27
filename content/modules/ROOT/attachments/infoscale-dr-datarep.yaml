@@ -12,9 +12,9 @@ spec:
       latencyProtection: disable
       logProtection: autodcm
       networkTransportProtocol: TCP
-      remoteHostAddress: 192.168.20.200
+      remoteHostAddress: 10.10.20.11
       remoteNIC: br-ex
-      remoteNetMask: 255.255.255.0
+      remoteNetMask: 255.255.0.0
       replicationState: start
       replicationType: async
   cloudVendor: Local
@@ -22,6 +22,6 @@ spec:
     namespace: openmrs
   currentPrimary: cluster-prod
   force: false
-  localHostAddress: 192.168.20.201
-  localNIC: ens256
-  localNetMask: 255.255.255.0
+  localHostAddress: 10.10.10.11
+  localNIC: br-ex
+  localNetMask: 255.255.0.0
